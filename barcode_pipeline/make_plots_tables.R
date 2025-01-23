@@ -3,6 +3,13 @@
 
 args = commandArgs(trailingOnly=TRUE)
 
+pkgs <- c("ggplot2","reshape2","plyr","dplyr","openxlsx")
+
+installed_packages <- pkgs %in% rownames(installed.packages())
+if(any(installed_packages==FALSE)){
+  install.packages(packages[!installed_packages])
+}
+
 library(ggplot2)
 library(reshape2)
 library(plyr)
