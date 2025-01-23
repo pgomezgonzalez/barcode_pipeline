@@ -16,6 +16,12 @@ args = commandArgs(trailingOnly=TRUE)
 ###time_point
 ###replicate 
 
+pkgs <- "dplyr"
+installed_packages <- pkgs %in% rownames(installed.packages())
+if(any(installed_packages==FALSE)){
+  install.packages(packages[!installed_packages])
+}
+
 library(dplyr)
 metadata <- read.table(args[1],sep="\t",header=T,stringsAsFactors=FALSE)
 
