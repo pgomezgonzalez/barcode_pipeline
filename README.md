@@ -61,7 +61,7 @@ The nanopore sequencing data should be stored in a folder named by the run name 
 There should there a folder called `pod5`, together with more files. 
 
 Make an `analysis` folder, and transfer here the required files:
-- metadata file: This can be a xlsx or txt (tab-delimited) file with the following data in columns:
+- **metadata file**: This can be a xlsx or txt (tab-delimited) file with the following data in columns:
     - `experiment_id` = whatever name/ID you want to give to this experiment
     - `flow_cell_id` = flow cell identification used (i.e. FAZ01857)
     - `kit` = name of the kit used for library preparation (i.e. SQK-NBD114-96)
@@ -84,3 +84,12 @@ kostas_GIA_1  |   FAZ01857   | SQK-NBD114-96 | PvDBPa    | barcode04 | time2rep1
 ...
 ...
 ```
+If you make it in excel, save it as .xlsx or tab-delimited (.txt) file! 
+
+- **sample_sheet**: this is just the name of the sample sheet that the basecaller will take to only allocate reads to the barcodes used. Recommend to just leave it as `sample_sheet`.
+
+- **kit_name**: name of the kit used. For example, SQK-NBD114-96.
+
+- **data**: 
+
+- **ref_fasta file**: this is the reference gene in fasta file to which the sequencing reads will be aligned. To make a fasta file
