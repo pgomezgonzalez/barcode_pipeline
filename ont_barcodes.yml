@@ -1,4 +1,4 @@
-name: dorado_ont
+name: ont_barcodes
 channels:
   - hcc
   - conda-forge
