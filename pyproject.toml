@@ -11,4 +11,4 @@ dynamic = ["version", "description"]
 
 
 [project.scripts]
-demux-pipeline = "barcode_pipeline:ont_barcodes_analysis.cli"
+barcodes-pipeline = "barcode_pipeline:ont_barcodes_analysis.cli"
