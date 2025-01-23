@@ -62,14 +62,14 @@ There should there a folder called `pod5`, together with more files.
 
 Make an `analysis` folder, and transfer here the required files:
 - metadata file: This can be a xlsx or txt (tab-delimited) file with the following data in columns:
-    `experiment_id` = whatever name/ID you want to give to this experiment
-    `flow_cell_id` = flow cell identification used (i.e. FAZ01857)
-    `kit` = name of the kit used for library preparation (i.e. SQK-NBD114-96)
-    `sample_id` = name given to the samples run (each sample is 1 barcode)
-    `barcode` = list of barcodes used (i.e. barcode01)
-    `alias` = an alias name you want to give to each barcode (has to be different than barcode name, can be sample_id)
-    `time_point` = time point associated with each barcode
-    `replicate` = number of replicate of each time point
+    - `experiment_id` = whatever name/ID you want to give to this experiment
+    - `flow_cell_id` = flow cell identification used (i.e. FAZ01857)
+    - `kit` = name of the kit used for library preparation (i.e. SQK-NBD114-96)
+    - `sample_id` = name given to the samples run (each sample is 1 barcode)
+    - `barcode` = list of barcodes used (i.e. barcode01)
+    - `alias` = an alias name you want to give to each barcode (has to be different than barcode name, can be sample_id)
+    - `time_point` = time point associated with each barcode
+    - `replicate` = number of replicate of each time point
 
 It should look like this:
 
