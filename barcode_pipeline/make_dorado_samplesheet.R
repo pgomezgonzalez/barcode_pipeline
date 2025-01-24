@@ -8,6 +8,7 @@ args = commandArgs(trailingOnly=TRUE)
 #args[1] = metadata file (should be in .txt tab delimited)
 #columns to have
 ###experiment_id
+###nanopore_run_id
 ###flow_cell_id
 ###kit
 ###sample_id

@@ -125,13 +125,16 @@ summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
 
 summary_df3 <- summarySE(df3_melt,measurevar="value",groupvars=c("time_point","variable"))
 
+timepoints <- unique(df3_nototal$time_point)
+a <- min(timepoints)
+b <- max(timepoints)
 
 ggplot(summary_df3,aes(x=time_point,y=mean,col=variable)) + geom_point(size=2) + geom_line() + 
 geom_errorbar(aes(ymin=mean-sd,ymax=mean+sd),colour="black",width=.2) + theme_classic() +
 labs(x="Time point", y="Proportion of reads",colour="Internal barcode",title="Mean percentage of reads in each pool mapping to each internal barcode") + 
-scale_x_continuous(breaks=seq(0,3,by=1))
+scale_x_continuous(breaks=seq(a,b,by=1))
 
-ggsave("line_plot_barcodes.png")
+ggsave("lineplot_barcodes.png")
 
 summary_df3.2 <- subset(summary_df3,select=-c(ci))
 write.table(summary_df3.2,file="summary_proportions.txt",sep="\t",quote=F,row.names=F)
@@ -140,6 +143,8 @@ write.table(summary_df3.2,file="summary_proportions.txt",sep="\t",quote=F,row.na
 ##Make barplot
 ggplot(summary_df3,aes(x=time_point,y=mean,fill=variable)) + geom_bar(position="stack",stat="identity") +
 theme_classic() + labs(x="Time point",y="Proportion of reads",fill="Internal barcode") 
+
+ggsave("barplot_barcodes.png")
 
 
 list_results <- list("reads" = df, "proportions" = df2, "percentages" = df3, "percentages_long" = df3_melt, "summary" = summary_df3.2)
