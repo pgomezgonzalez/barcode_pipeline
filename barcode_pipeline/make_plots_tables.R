@@ -7,7 +7,7 @@ pkgs <- c("ggplot2","reshape2","plyr","dplyr","openxlsx")
 
 installed_packages <- pkgs %in% rownames(installed.packages())
 if(any(installed_packages==FALSE)){
-  install.packages(pkgs[!installed_packages])
+  install.packages(pkgs[!installed_packages],repos="https://cran.uk.r-project.org/")
 }
 
 library(ggplot2)
