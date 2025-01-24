@@ -9,6 +9,8 @@ import pandas as pd
 import sys
 import subprocess as sp 
 import shutil
+import logging
+
 script_path =  os.path.dirname(os.path.realpath(__file__))
 
 def cli():
@@ -22,7 +24,9 @@ def cli():
 	argparser.add_argument("output", help="name of output bam file")
 	argparser.add_argument("ref_fasta", help="reference gene")
 	argparser.add_argument("internal_barcodes", help="file with internal barcodes and variant_id")
+	argparser.add_argument("prefix", help="prefix for all the results files")
 	argparser.add_argument("--skip-basecalling",action="store_true", help="Skip basecalling if the flag is provided")
+	
 
 	args = argparser.parse_args()
 
@@ -150,7 +154,17 @@ def cli():
 	sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes.csv total_reads {output_file}', shell=True)
 
 	###Remove temporary files 
-	#sp.run(r'rm list_bams list_demux_bams2 list_all_bams_final list_bams_final total_reads count_reads barcodes_variants count_reads_internal_barcodes.csv', shell=True)
+	sp.run(r'rm list_bams list_demux_bams2 list_all_bams_final list_bams_final total_reads count_reads barcodes_variants count_reads_internal_barcodes.csv', shell=True)
 
+	###Rename files with prefix of the run to differentiate 
+	sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
+	sp.run(f'mv barplot_barcodes.png {args.prefix}.barplot_barcodes.png', shell=True)
+	sp.run(f'mv results.xlsx {args.prefix}.barplot_barcodes.png',shell=True)
+	sp.run(f'mv table_reads.txt {args.prefix}.table_reads.txt', shell=True)
+	sp.run(f'mv table_proportions.txt {args.prefix}.table_proportions.txt', shell=True)
+	sp.run(f'mv table_percentages.txt {args.prefix}.table_percentages.txt', shell=True)
+	sp.run(f'mv internal_barcodes {args.prefix}.internal_barcodes', shell=True)
+	sp.run(f'mv sample_sheet.csv {args.prefix}.sample_sheet.csv', shell=True)
+	
 
 	print("ALL DONE!")
