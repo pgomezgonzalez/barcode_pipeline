@@ -22,6 +22,7 @@ def cli():
 	argparser.add_argument("output", help="name of output bam file")
 	argparser.add_argument("ref_fasta", help="reference gene")
 	argparser.add_argument("internal_barcodes", help="file with internal barcodes and variant_id")
+	argparser.add_argument("--skip-basecalling",action="store_true", help="Skip basecalling if the flag is provided")
 
 	args = argparser.parse_args()
 
@@ -52,16 +53,18 @@ def cli():
 
 	output_file = convert_xlsx_to_txt(args.metadata)
 
-
-	##Make sample_sheet from metadata 
-	sp.run(f'Rscript {script_path}/make_dorado_samplesheet.R {output_file} {args.sample_sheet}', shell=True)
+	if not args.skip_basecalling:
+		##Make sample_sheet from metadata 
+		sp.run(f'Rscript {script_path}/make_dorado_samplesheet.R {output_file} {args.sample_sheet}', shell=True)
 
 	############################################################################################################################################################
 	############################################################################################################################################################
 	################################################################--------BASECALLING------###################################################################
 
-	#Run dorado basecaller 
-	sp.run(f'dorado basecaller --min-qscore 10 --kit-name {args.kit_name} --sample-sheet {args.sample_sheet} -r sup {args.data} > {args.output}.bam', shell=True)
+		#Run dorado basecaller 
+		sp.run(f'dorado basecaller --min-qscore 10 --kit-name {args.kit_name} --sample-sheet {args.sample_sheet} -r sup {args.data} > {args.output}.bam', shell=True)
+	else:
+		print("skipping basecalling")
 
 
 	create_output_directory("demux")
@@ -104,12 +107,11 @@ def cli():
 	################################################################--------ANALYSIS------######################################################################
 
 
-	##One mapped, we can extract the number of reads per barcode for each interanl barcode 
+	##One mapped, we can extract the number of reads per barcode for each internal barcode 
 	##We need a file with internal barcodes and variant_id called internal_barcodes.txt
 
 	sp.run(r'cat list_bams | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads"', shell=True)
-
-
+	shutil.copyfile(args.internal_barcodes,"internal_barcodes")
 
 	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | wc -l >> count_reads"; done < list_bams''', shell=True)
 	sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo -e $line'\t'{1} >> barcodes_variants"; done < list_bams''', shell=True)
