@@ -62,6 +62,7 @@ def cli():
 	################################################################--------BASECALLING------###################################################################
 
 		#Run dorado basecaller 
+		print("...starting basecalling...")
 		sp.run(f'dorado basecaller --min-qscore 10 --kit-name {args.kit_name} --sample-sheet {args.sample_sheet} -r sup {args.data} > {args.output}.bam', shell=True)
 	else:
 		print("skipping basecalling")
@@ -75,6 +76,7 @@ def cli():
 	##############################################################--------DEMULTIPLEXING------##################################################################
 
 	#Demultiplex into NP barcodes. It should create 1 bam file per barcode in demux directory
+	print("...demultiplexing...")
 	sp.run(f'dorado demux --output-dir demux --no-classify --emit-summary {args.output}.bam', shell=True)
 
 
@@ -99,6 +101,7 @@ def cli():
 		sp.run(r'paste list_demux_bams2 list_bams > list_all_bams_final',shell=True)
 		sp.run(f'Rscript {script_path}/barcodes_used.R {args.metadata}', shell=True)
 		sp.run(r'cat barcodes_used | parallel -j 1 "grep {} list_all_bams_final" > list_bams_final', shell=True)
+		print("...filtering and creating fastqs...")
 		sp.run(r'''cat list_bams_final | parallel -j 1 --col-sep "\t" "samtools view -b -e '[qs]>=8' {1} | samtools fastq - | pigz -c > ./fastqs/{2}.fastq.gz"''',shell=True)
 
 
@@ -110,6 +113,7 @@ def cli():
 	#we need a reference gene = fasta 
 	create_output_directory("mapping")
 
+	print("...aligning barcodes to reference...")
 	sp.run(f'dorado aligner {args.ref_fasta} ./fastqs/ --output-dir ./mapping --emit-summary', shell=True)
 
 
@@ -123,7 +127,7 @@ def cli():
 
 	shutil.copyfile(args.internal_barcodes,"internal_barcodes")
 
-	if not arg.skip_basecalling:
+	if not args.skip_basecalling:
 
 		sp.run(r'cat list_bams | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads"', shell=True)
 		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | wc -l >> count_reads"; done < list_bams''', shell=True)
@@ -140,4 +144,7 @@ def cli():
 
 	
 	#Run Rscript to create plots and tables 
+	print("...generating tables and plots...")
 	sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes total_reads {output_file}', shell=True)
+
+	print("ALL DONE!")
