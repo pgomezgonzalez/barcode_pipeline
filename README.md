@@ -56,6 +56,27 @@ To do it you just need to type `barcodes-pipeline` and a message like this shoul
 usage: barcodes-pipeline [-h] metadata sample_sheet kit_name data output ref_fasta internal_barcodes
 barcodes-pipeline: error: the following arguments are required: metadata, sample_sheet, kit_name, data, output, ref_fasta, internal_barcodes
 ```
+
+If you want to see the help from the command just type `barcodes-pipeline -h` and you should see something like:
+```
+usage: barcodes-pipeline [-h] [--skip-basecalling] metadata sample_sheet kit_name data output ref_fasta internal_barcodes
+
+Basecalling and demultiplexing of ONT pod5 data with dorado followed by internal barcodes analysis
+
+positional arguments:
+  metadata            metadata with experiment_id,flow_cell_id,kit_id,barcode,alias,time_point,replicate
+  sample_sheet        name of sample sheet for dorado basecalling
+  kit_name            name of the kit used
+  data                the data directory (folder with all pod5 files)
+  output              name of output bam file
+  ref_fasta           reference gene
+  internal_barcodes   file with internal barcodes and variant_id
+
+options:
+  -h, --help          show this help message and exit
+  --skip-basecalling  Skip basecalling if the flag is provided
+```
+
 The arguments that need to be given to the command are:
 
 - **metadata**: The file with metadata, that can be a xlsx or txt (tab-delimited) file with the following data in columns:
@@ -88,7 +109,7 @@ If you make it in excel, save it as .xlsx or tab-delimited (.txt) file!
 
 - **kit_name**: name of the kit used. For example, SQK-NBD114-96.
 
-- **data**: this is the folder containing all the pod5 files, the nanopore data for basecalling.
+- **data**: this is the folder containing all the pod5 files, the nanopore data for basecalling (usually will be called `pod5`).
 
 - **output**: this is the name you want to give to the file containing the reads after basecalling (i.e. kk_GIA_20240125)
 
@@ -125,4 +146,15 @@ In your local terminal, go to the directory where you have the files.
 Once there, you can copy them to your profile in the server with:
 ```
 scp metadata.txt internal_barcodes.txt amplicon.fa username@10.18.0.25:<run_folder>/<run_date_folder>/analysis/
+```
+
+The pipeline runs the whole analysis from basecalling of the pod5 files and outputs a results spreadsheet and 2 plots (line plot and barplot). 
+But if the basecalling process has already been 
+
+## Upgrading package
+
+If there has been any upgrades in the package, you can reinstall the new version with 
+```
+conda activate ont_barcodes     #Make sure you are in the right environment where it is installed
+pip install --upgrade --force-reinstall git+https://github.com/pgomezgonzalez/barcode_pipeline
 ```

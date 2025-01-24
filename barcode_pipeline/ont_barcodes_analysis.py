@@ -100,7 +100,7 @@ def cli():
 		sp.run(f'Rscript {script_path}/barcodes_used.R {args.metadata}', shell=True)
 		sp.run(r'cat barcodes_used | parallel -j 1 "grep {} list_all_bams_final" > list_bams_final', shell=True)
 		sp.run(r'''cat list_bams_final | parallel -j 1 --col-sep "\t" "samtools view -b -e '[qs]>=8' {1} | samtools fastq - | pigz -c > ./fastqs/{2}.fastq.gz"''',shell=True)
-		
+
 
 	############################################################################################################################################################
 	############################################################################################################################################################
@@ -121,11 +121,20 @@ def cli():
 	##One mapped, we can extract the number of reads per barcode for each internal barcode 
 	##We need a file with internal barcodes and variant_id called internal_barcodes.txt
 
-	sp.run(r'cat list_bams | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads"', shell=True)
 	shutil.copyfile(args.internal_barcodes,"internal_barcodes")
 
-	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | wc -l >> count_reads"; done < list_bams''', shell=True)
-	sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo -e $line'\t'{1} >> barcodes_variants"; done < list_bams''', shell=True)
+	if not arg.skip_basecalling:
+
+		sp.run(r'cat list_bams | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads"', shell=True)
+		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | wc -l >> count_reads"; done < list_bams''', shell=True)
+		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo -e $line'\t'{1} >> barcodes_variants"; done < list_bams''', shell=True)
+	
+	else:
+		sp.run(r'cat barcodes_used | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads"', shell=True)
+		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | wc -l >> count_reads"; done < barcodes_used''', shell=True)
+		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo -e $line'\t'{1} >> barcodes_variants"; done < barcodes_used''', shell=True)
+	
+	
 	sp.run(r'paste barcodes_variants count_reads > count_reads_internal_barcodes.csv', shell=True)
 
 
