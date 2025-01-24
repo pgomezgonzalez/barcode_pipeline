@@ -132,13 +132,13 @@ def cli():
 		sp.run(r'cat list_bams | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads"', shell=True)
 		print("...counting reads...")
 		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | wc -l >> count_reads"; done < list_bams''', shell=True)
-		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo -e $line'\t'{1} >> barcodes_variants"; done < list_bams''', shell=True)
+		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants"; done < list_bams''', shell=True)
 	
 	else:
 		sp.run(r'cat barcodes_used | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads"', shell=True)
 		print("...counting reads...")
 		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | wc -l >> count_reads"; done < barcodes_used''', shell=True)
-		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo -e $line'\t'{1} >> barcodes_variants"; done < barcodes_used''', shell=True)
+		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants"; done < barcodes_used''', shell=True)
 	
 	
 	sp.run(r'paste barcodes_variants count_reads > count_reads_internal_barcodes.csv', shell=True)
@@ -150,7 +150,7 @@ def cli():
 	sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes.csv total_reads {output_file}', shell=True)
 
 	###Remove temporary files 
-	sp.run(r'rm ')
+	#sp.run(r'rm list_bams list_demux_bams2 list_all_bams_final list_bams_final total_reads count_reads barcodes_variants count_reads_internal_barcodes.csv', shell=True)
 
 
 	print("ALL DONE!")
