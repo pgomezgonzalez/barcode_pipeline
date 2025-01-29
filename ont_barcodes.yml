@@ -1,6 +1,5 @@
 name: ont_barcodes
 channels:
-  - hcc
   - conda-forge
   - bioconda
   - defaults
@@ -19,7 +18,6 @@ dependencies:
   - ca-certificates=2024.12.31=h06a4308_0
   - cairo=1.18.2=h3394656_1
   - curl=8.11.1=h332b0f4_0
-  - dorado=0.7.2=h5e1937b_0
   - font-ttf-dejavu-sans-mono=2.37=hab24e00_0
   - font-ttf-inconsolata=3.000=h77eed37_0
   - font-ttf-source-code-pro=2.038=h77eed37_0
@@ -312,4 +310,3 @@ dependencies:
     - pytz==2024.2
     - six==1.17.0
     - tzdata==2025.1
-prefix: /mnt/storageG1/paola/miniconda3/envs/dorado_ont
