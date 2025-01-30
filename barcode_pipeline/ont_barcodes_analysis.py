@@ -112,7 +112,9 @@ def cli():
 		print("list_demux_bams2 done")
 		sp.run(r'paste list_demux_bams2 list_bams > list_all_bams_final',shell=True)
 		print("list_all_bams_final done")
-		sp.run(f'Rscript {script_path}/barcodes_used.R {output_file}')
+		command = f'Rscript {script_path}/barcodes_used.R {output_file}'
+		sp.run(command, shell=True)
+		#sp.run(f'Rscript {script_path}/barcodes_used.R {output_file}',shell=True)
 		print("barcodes_used done")
 		sp.run(r'cat barcodes_used | parallel -j 1 "grep {} list_all_bams_final" > list_bams_final', shell=True)
 		print("...filtering and creating fastqs...")
