@@ -143,10 +143,15 @@ b <- max(timepoints)
 ab <- unique(df3_nototal$sample_id)
 
 #for(i in 1:length(ab)){
-  subset <- df3_nototal[which(df3_nototal$sample_id==ab[i]),]
-  ggplot(subset,aes(x=concentration,y=mean,fill=variable) + geom_bar(position="stack",stat="identity") +
-  theme_classic() + )
+  #subset <- df3_nototal[which(df3_nototal$sample_id==ab[i]),]
+  #ggplot(subset,aes(x=concentration,y=mean,fill=variable) + geom_bar(position="stack",stat="identity") +
+  #theme_classic() 
 #}
+summary_df3.2 <- subset(summary_df3,select=-c(ci))
+write.table(summary_df3.2,file="summary_proportions.txt",sep="\t",quote=F,row.names=F)
+
+list_results <- list("reads" = df, "proportions" = df2, "percentages" = df3, "percentages_long" = df3_melt, "summary" = summary_df3.2)
+write.xlsx(list_results,file="results.xlsx")
 
 ggplot(summary_df3,aes(x=time_point,y=mean,col=variable)) + geom_point(size=2) + geom_line() + 
 geom_errorbar(aes(ymin=mean-sd,ymax=mean+sd),colour="black",width=.2) + theme_classic() +
@@ -154,9 +159,6 @@ labs(x="Time point", y="Proportion of reads",colour="Internal barcode",title="Me
 scale_x_continuous(breaks=seq(a,b,by=1))
 
 ggsave("lineplot_barcodes.png")
-
-summary_df3.2 <- subset(summary_df3,select=-c(ci))
-write.table(summary_df3.2,file="summary_proportions.txt",sep="\t",quote=F,row.names=F)
 
 
 ##Make barplot
@@ -166,7 +168,5 @@ theme_classic() + labs(x="Time point",y="Proportion of reads",fill="Internal bar
 ggsave("barplot_barcodes.png")
 
 
-list_results <- list("reads" = df, "proportions" = df2, "percentages" = df3, "percentages_long" = df3_melt, "summary" = summary_df3.2)
-write.xlsx(list_results,file="results.xlsx")
 
 
