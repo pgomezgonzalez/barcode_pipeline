@@ -42,32 +42,33 @@ for(i in 1:nrow(df)){
 	df[i,1:length(internal_barcodes)] <- reads
 }
 
+df$total_reads_barcodes <- rowSums(df[1:length(internal_barcodes)])
 df$total_reads <- total$V1
+
 
 #make a normalised column per each of them 
 mat1 <- as.matrix(df[1:nrow(df),1:length(internal_barcodes)])
 mat2 <- mat1 
 
-mat2 <- as.matrix(mat1 / df$total_reads)
+mat2 <- as.matrix(mat1 / df$total_reads_barcodes)
 mat3 <- as.matrix(mat2*100)
 mat3 <- as.data.frame(mat3)
 mat3$total_percentage <- rowSums(mat3)
 
-print(df)
 write.table(df,file="table_reads.txt",sep="\t",quote=F,row.names=F)
 
 df2 <- as.data.frame(mat2)
 df2$NP_barcode <- NP_barcodes
+df2$total_reads_barcodes <- df$total_reads_barcodes
 df2$total_reads <- df$total_reads
 
-print(df2)
 write.table(df2,file="table_proportions.txt",sep="\t",quote=F,row.names=F)
 
 df3 <- as.data.frame(mat3)
 df3$NP_barcode <- NP_barcodes
+df3$total_reads_barcodes <- df$total_reads_barcodes
 df3$total_reads <- df$total_reads
 
-print(df3)
 write.table(df3,file="table_percentages.txt",sep="\t",quote=F,row.names=F)
 
 #generate averages by timepoint using the replicates
@@ -87,7 +88,7 @@ df3_nototal <- subset(df3,select=-c(total_reads,total_percentage))
 
 ##Remove total_reads and total percentage 
 df3_nototal$time_point <- as.numeric(df3_nototal$time_point)
-print(df_nototal)
+print(df3_nototal)
 df3_melt <- melt(df3_nototal,id=c("NP_barcode","time_point","replicate"))
 
 
