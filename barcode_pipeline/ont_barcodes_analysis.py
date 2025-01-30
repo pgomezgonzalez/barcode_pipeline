@@ -107,17 +107,9 @@ def cli():
 	else:
 		print("removing not used barcodes")
 		sp.run(r"""ls ./demux/*barcode*.bam | sed 's/.*\(barcode[0-9]*\)\.bam/\1/' > list_bams""", shell=True)
-		print("list_bams_done")
 		sp.run(r'ls ./demux/*barcode*.bam > list_demux_bams2',shell=True)
-		print("list_demux_bams2 done")
 		sp.run(r'paste list_demux_bams2 list_bams > list_all_bams_final',shell=True)
-		print("list_all_bams_final done")
-		print({output_file})
-		print({script_path})
-		#command = f'"Rscript {script_path}/barcodes_used.R" "{output_file}"'
-		#sp.run(command, shell=True)
 		sp.run(f'Rscript {script_path}/barcodes_used.R {output_file}',shell=True)
-		print("barcodes_used done")
 		sp.run(r'cat barcodes_used | parallel -j 1 "grep {} list_all_bams_final" > list_bams_final', shell=True)
 		print("...filtering and creating fastqs...")
 		sp.run(r'''cat list_bams_final | parallel -j 1 --col-sep "\t" "samtools view -b -e '[qs]>=8' {1} | samtools fastq - | pigz -c > ./fastqs/{2}.fastq.gz"''',shell=True)
@@ -151,13 +143,13 @@ def cli():
 		print("...counting reads...")
 		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | wc -l >> count_reads"; done < list_bams''', shell=True)
 		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants"; done < list_bams''', shell=True)
-	
+		print(barcodes_variants)
 	else:
 		sp.run(r'cat barcodes_used | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads"', shell=True)
 		print("...counting reads...")
 		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | wc -l >> count_reads"; done < barcodes_used''', shell=True)
 		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants"; done < barcodes_used''', shell=True)
-	
+		print(barcodes_variants)
 	
 	sp.run(r'paste barcodes_variants count_reads > count_reads_internal_barcodes.csv', shell=True)
 
@@ -173,12 +165,11 @@ def cli():
 	###Rename files with prefix of the run to differentiate 
 	sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
 	sp.run(f'mv barplot_barcodes.png {args.prefix}.barplot_barcodes.png', shell=True)
-	sp.run(f'mv results.xlsx {args.prefix}.barplot_barcodes.png',shell=True)
+	sp.run(f'mv results.xlsx {args.prefix}.results.xlsx',shell=True)
 	sp.run(f'mv table_reads.txt {args.prefix}.table_reads.txt', shell=True)
 	sp.run(f'mv table_proportions.txt {args.prefix}.table_proportions.txt', shell=True)
 	sp.run(f'mv table_percentages.txt {args.prefix}.table_percentages.txt', shell=True)
 	sp.run(f'mv internal_barcodes {args.prefix}.internal_barcodes', shell=True)
-	sp.run(f'mv sample_sheet.csv {args.prefix}.sample_sheet.csv', shell=True)
-	
+	sp.run(f'mv sample_sheet.csv {args.prefix}.sample_sheet.csv', shell=True)	
 
 	print("ALL DONE!")
