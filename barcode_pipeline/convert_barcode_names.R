@@ -3,7 +3,7 @@
 
 args = commandArgs(trailingOnly=TRUE)
 
-metadata < -read.table(args[1],sep="\t",header=T,stringsAsFactors=F)
+metadata <- read.table(args[1],sep="\t",header=T,stringsAsFactors=F)
 
 ##add "barcode" or "barcode0" to the barcode column if not given 
 
