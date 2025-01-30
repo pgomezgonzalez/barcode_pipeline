@@ -107,7 +107,9 @@ def cli():
 	else:
 		print("removing not used barcodes")
 		sp.run(r"""ls ./demux/*barcode*.bam | sed 's/.*\(barcode[0-9]*\)\.bam/\1/' > list_bams""", shell=True)
+		print("list_bams_done")
 		sp.run(r'ls ./demux/*barcode*.bam > list_demux_bams2',shell=True)
+		print("list_demux_bams2 done")
 		sp.run(r'paste list_demux_bams2 list_bams > list_all_bams_final',shell=True)
 		sp.run(f'Rscript {script_path}/barcodes_used.R {output_file}', shell=True)
 		sp.run(r'cat barcodes_used | parallel -j 1 "grep {} list_all_bams_final" > list_bams_final', shell=True)
