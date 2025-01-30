@@ -10,7 +10,7 @@ metadata <- read.table(args[1],sep="\t",header=T,stringsAsFactors=F)
 barcodes <- metadata$barcode
 new_barcodes <- c()
 
-for(i in 1:length(new_barcodes)){
+for(i in 1:length(barcodes)){
   if(length(grep("barcode*",barcodes[i])) == 0){
     if(nchar(barcodes[i])==1){
       new_barcodes[i] <- paste("barcode0",barcodes[i],sep="") 
