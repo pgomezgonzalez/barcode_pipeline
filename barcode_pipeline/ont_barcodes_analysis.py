@@ -26,6 +26,7 @@ def cli():
 	argparser.add_argument("internal_barcodes", help="file with internal barcodes and variant_id")
 	argparser.add_argument("prefix", help="prefix for all the results files")
 	argparser.add_argument("--skip-basecalling",action="store_true", help="Skip basecalling if the flag is provided")
+	argparser.add_argument("--only-basecalling",action="store_true", help="Only perform basecalling")
 	
 
 	args = argparser.parse_args()
@@ -57,6 +58,8 @@ def cli():
 
 	output_file = convert_xlsx_to_txt(args.metadata)
 
+	output_file = sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
+
 	if not args.skip_basecalling:
 		##Make sample_sheet from metadata 
 		sp.run(f'Rscript {script_path}/make_dorado_samplesheet.R {output_file} {args.sample_sheet}', shell=True)
@@ -68,6 +71,9 @@ def cli():
 		#Run dorado basecaller 
 		print("...starting basecalling...")
 		sp.run(f'dorado basecaller --min-qscore 10 --kit-name {args.kit_name} --sample-sheet {args.sample_sheet} -r sup {args.data} > {args.output}.bam', shell=True)
+
+		if args.only_basecalling:
+			sys.exit("...basecalling finished...EXITING...")
 	else:
 		print("...SKIPPING BASECALLING...")
 

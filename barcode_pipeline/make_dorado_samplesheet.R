@@ -40,4 +40,7 @@ columns_sample_sheet <- c("experiment_id","flow_cell_id","kit","barcode","alias"
 #substract columns that match the columns_sample_sheet
 df <- metadata %>% dplyr::select(matches(columns_sample_sheet))
 
+
 write.table(df,file=paste(args[2],".csv",sep=""),sep=",",quote=FALSE,row.names=FALSE)
+
+
