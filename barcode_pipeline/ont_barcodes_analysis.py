@@ -170,6 +170,7 @@ def cli():
 	sp.run(f'mv table_proportions.txt {args.prefix}.table_proportions.txt', shell=True)
 	sp.run(f'mv table_percentages.txt {args.prefix}.table_percentages.txt', shell=True)
 	sp.run(f'mv internal_barcodes {args.prefix}.internal_barcodes', shell=True)
-	sp.run(f'mv sample_sheet.csv {args.prefix}.sample_sheet.csv', shell=True)	
+	sp.run(f'mv sample_sheet.csv {args.prefix}.sample_sheet.csv', shell=True)
+	sp.run(f'mv summary_proportions.txt {args.prefix}.summary_proportions.txt',shell=True)	
 
 	print("ALL DONE!")
