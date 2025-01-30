@@ -58,7 +58,7 @@ def cli():
 
 	output_file = convert_xlsx_to_txt(args.metadata)
 
-	output_file = sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
+	sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
 
 	if not args.skip_basecalling:
 		##Make sample_sheet from metadata 
@@ -112,12 +112,11 @@ def cli():
 		print("list_demux_bams2 done")
 		sp.run(r'paste list_demux_bams2 list_bams > list_all_bams_final',shell=True)
 		print("list_all_bams_final done")
-		print("{output_file}")
 		print({output_file})
 		print({script_path})
-		command = f'"Rscript {script_path}/barcodes_used.R" "{output_file}"'
-		sp.run(command, shell=True)
-		#sp.run(f'Rscript {script_path}/barcodes_used.R {output_file}',shell=True)
+		#command = f'"Rscript {script_path}/barcodes_used.R" "{output_file}"'
+		#sp.run(command, shell=True)
+		sp.run(f'Rscript {script_path}/barcodes_used.R {output_file}',shell=True)
 		print("barcodes_used done")
 		sp.run(r'cat barcodes_used | parallel -j 1 "grep {} list_all_bams_final" > list_bams_final', shell=True)
 		print("...filtering and creating fastqs...")
