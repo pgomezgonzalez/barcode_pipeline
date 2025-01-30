@@ -112,6 +112,9 @@ def cli():
 		print("list_demux_bams2 done")
 		sp.run(r'paste list_demux_bams2 list_bams > list_all_bams_final',shell=True)
 		print("list_all_bams_final done")
+		print("{output_file}")
+		print({output_file})
+		print({script_path})
 		command = f'"Rscript {script_path}/barcodes_used.R" "{output_file}"'
 		sp.run(command, shell=True)
 		#sp.run(f'Rscript {script_path}/barcodes_used.R {output_file}',shell=True)
