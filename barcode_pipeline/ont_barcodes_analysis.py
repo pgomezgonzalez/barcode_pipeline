@@ -60,7 +60,7 @@ def cli():
 
 	output_file = sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
 
-	if not args.skip_basecalling:
+	if not args.skip-basecalling:
 		##Make sample_sheet from metadata 
 		sp.run(f'Rscript {script_path}/make_dorado_samplesheet.R {output_file} {args.sample_sheet}', shell=True)
 
@@ -72,7 +72,7 @@ def cli():
 		print("...starting basecalling...")
 		sp.run(f'dorado basecaller --min-qscore 10 --kit-name {args.kit_name} --sample-sheet {args.sample_sheet} -r sup {args.data} > {args.output}.bam', shell=True)
 
-		if args.only_basecalling:
+		if args.only-basecalling:
 			sys.exit("...basecalling finished...EXITING...")
 	else:
 		print("...SKIPPING BASECALLING...")
@@ -97,7 +97,7 @@ def cli():
 	#Filter the reads based on quality score >=8
 	create_output_directory("fastqs")
 
-	if not args.skip_basecalling:
+	if not args.skip-basecalling:
 
 		sp.run(r"""ls ./demux/*barcode*.bam | sed 's/.*\(barcode[0-9]*\)\.bam/\1/' > list_bams""", shell=True)
 		sp.run(r'ls ./demux/*barcode*.bam > list_demux_bams2',shell=True)
@@ -139,7 +139,7 @@ def cli():
 
 	shutil.copyfile(args.internal_barcodes,"internal_barcodes")
 
-	if not args.skip_basecalling:
+	if not args.skip-basecalling:
 
 		sp.run(r'cat list_bams | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads"', shell=True)
 		print("...counting reads...")
