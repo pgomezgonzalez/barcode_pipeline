@@ -149,7 +149,7 @@ def cli():
 		print("...counting reads...")
 		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | wc -l >> count_reads"; done < barcodes_used''', shell=True)
 		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants"; done < barcodes_used''', shell=True)
-		sp.run(r'cat barcodes_variants')
+		sp.run(r'cat barcodes_variants', shell=True)
 	
 	sp.run(r'paste barcodes_variants count_reads > count_reads_internal_barcodes.csv', shell=True)
 
