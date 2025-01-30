@@ -84,7 +84,7 @@ for(i in 1:nrow(df3)){
 }
 
 ##Make line_plot
-df3_nototal <- subset(df3,select=-c(total_reads,total_percentage))
+df3_nototal <- subset(df3,select=-c(total_reads_barcodes,total_reads,total_percentage))
 
 ##Remove total_reads and total percentage 
 df3_nototal$time_point <- as.numeric(df3_nototal$time_point)
