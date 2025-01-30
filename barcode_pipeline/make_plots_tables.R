@@ -35,6 +35,8 @@ internal_barcodes <- unique(data$V2)
 df <- data.frame(matrix(ncol=length(internal_barcodes),nrow=length(NP_barcodes)))
 colnames(df) <- internal_barcodes
 df$NP_barcode <- NP_barcodes
+df$sample_id <-metadata$sample_id
+df$concentration <- metadata$alias 
 
 for(i in 1:nrow(df)){
 	subset <- data[which(data$V1==df$NP_barcode[i]),]
@@ -59,6 +61,8 @@ write.table(df,file="table_reads.txt",sep="\t",quote=F,row.names=F)
 
 df2 <- as.data.frame(mat2)
 df2$NP_barcode <- NP_barcodes
+df2$sample_id <- df$sample_id
+df2$concentration <- df$concentration
 df2$total_reads_barcodes <- df$total_reads_barcodes
 df2$total_reads <- df$total_reads
 
@@ -66,12 +70,14 @@ write.table(df2,file="table_proportions.txt",sep="\t",quote=F,row.names=F)
 
 df3 <- as.data.frame(mat3)
 df3$NP_barcode <- NP_barcodes
+df3$sample_id <- df$sample_id
+df3$concentration <- df$concentration
 df3$total_reads_barcodes <- df$total_reads_barcodes
 df3$total_reads <- df$total_reads
 
 write.table(df3,file="table_percentages.txt",sep="\t",quote=F,row.names=F)
 
-#generate averages by timepoint using the replicates
+#generate averages by timepoint and by antibody used using the replicates
 
 df3$time_point <- "" 
 df3$replicate <- "" 
@@ -88,8 +94,8 @@ df3_nototal <- subset(df3,select=-c(total_reads_barcodes,total_reads,total_perce
 
 ##Remove total_reads and total percentage 
 df3_nototal$time_point <- as.numeric(df3_nototal$time_point)
-print(df3_nototal)
-df3_melt <- melt(df3_nototal,id=c("NP_barcode","time_point","replicate"))
+
+df3_melt <- melt(df3_nototal,id=c("NP_barcode","time_point","replicate","sample_id","concentration"))
 
 
 
@@ -128,12 +134,19 @@ summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
     return(datac)
 }
 
-summary_df3 <- summarySE(df3_melt,measurevar="value",groupvars=c("time_point","variable"))
-print(summary_df3)
+summary_df3 <- summarySE(df3_melt,measurevar="value",groupvars=c("time_point","sample_id","concentration","variable"))
 
 timepoints <- unique(df3_nototal$time_point)
 a <- min(timepoints)
 b <- max(timepoints)
+
+ab <- unique(df3_nototal$sample_id)
+
+#for(i in 1:length(ab)){
+  subset <- df3_nototal[which(df3_nototal$sample_id==ab[i]),]
+  ggplot(subset,aes(x=concentration,y=mean,fill=variable) + geom_bar(position="stack",stat="identity") +
+  theme_classic() + )
+#}
 
 ggplot(summary_df3,aes(x=time_point,y=mean,col=variable)) + geom_point(size=2) + geom_line() + 
 geom_errorbar(aes(ymin=mean-sd,ymax=mean+sd),colour="black",width=.2) + theme_classic() +
