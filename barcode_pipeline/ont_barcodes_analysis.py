@@ -109,7 +109,7 @@ def cli():
 		sp.run(r"""ls ./demux/*barcode*.bam | sed 's/.*\(barcode[0-9]*\)\.bam/\1/' > list_bams""", shell=True)
 		sp.run(r'ls ./demux/*barcode*.bam > list_demux_bams2',shell=True)
 		sp.run(r'paste list_demux_bams2 list_bams > list_all_bams_final',shell=True)
-		sp.run(f'Rscript {script_path}/barcodes_used.R {args.metadata}', shell=True)
+		sp.run(f'Rscript {script_path}/barcodes_used.R {output_file}', shell=True)
 		sp.run(r'cat barcodes_used | parallel -j 1 "grep {} list_all_bams_final" > list_bams_final', shell=True)
 		print("...filtering and creating fastqs...")
 		sp.run(r'''cat list_bams_final | parallel -j 1 --col-sep "\t" "samtools view -b -e '[qs]>=8' {1} | samtools fastq - | pigz -c > ./fastqs/{2}.fastq.gz"''',shell=True)
