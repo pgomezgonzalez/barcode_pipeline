@@ -62,6 +62,7 @@ def cli():
 
 	if not args.skip_basecalling:
 		##Make sample_sheet from metadata 
+		print("*****Generating sample sheet*****")
 		sp.run(f'Rscript {script_path}/make_dorado_samplesheet.R {output_file} {args.sample_sheet}', shell=True)
 
 	############################################################################################################################################################
@@ -70,7 +71,7 @@ def cli():
 
 		#Run dorado basecaller 
 		print("...starting basecalling...")
-		sp.run(f'dorado basecaller --min-qscore 10 --kit-name {args.kit_name} --sample-sheet {args.sample_sheet} -r sup {args.data} > {args.output}.bam', shell=True)
+		sp.run(f'dorado basecaller --min-qscore 10 --kit-name {args.kit_name} --sample-sheet {args.sample_sheet}.csv -r sup {args.data} > {args.output}.bam', shell=True)
 
 		if args.only_basecalling:
 			sys.exit("...basecalling finished...EXITING...")
@@ -160,7 +161,7 @@ def cli():
 	sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes.csv total_reads {output_file}', shell=True)
 
 	###Remove temporary files 
-	#sp.run(r'rm list_bams list_demux_bams2 list_all_bams_final list_bams_final total_reads count_reads barcodes_variants count_reads_internal_barcodes.csv', shell=True)
+	sp.run(r'rm list_bams list_demux_bams2 list_all_bams_final list_bams_final total_reads count_reads barcodes_variants count_reads_internal_barcodes.csv', shell=True)
 
 	###Rename files with prefix of the run to differentiate 
 	sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
