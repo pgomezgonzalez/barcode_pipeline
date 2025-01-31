@@ -18,7 +18,7 @@ for(i in 1:length(barcodes)){
       new_barcodes[i] <- paste("barcode",barcodes[i],sep="")
     }
   }else{
-    new_barcodes[i] <- new_barcodes[i]
+    new_barcodes[i] <- barcodes[i]
   }
 }
 
