@@ -21,15 +21,19 @@ library(openxlsx)
 
 data <- read.table(args[1],sep="\t",header=F,stringsAsFactors=FALSE)
 
-#read total number of counts per barcode (1 column)
+#read total number of counts per barcode (2 columns)
 total <- read.table(args[2],sep="\t",header=F,stringsAsFactors=FALSE)
 
 #read metadata file 
 metadata <- read.table(args[3],sep="\t",header=TRUE,stringsAsFactors=FALSE)
 
-##Make a table of proportion of reads per barcode/internal barcode (= per internal barcode per timepoint and replicate)
+#read coverage file (should be 8 columns, but the 5 ones are the important ones: barcode ref start end mean_coverage)
+#if --allow-missmatch then will be 16 columns 
+coverage <- read.table(args[4],sep="\t",header=FALSE,stringsAsFactors=FALSE)
 
-NP_barcodes <- unique(data$V1)
+##Make a table of proportion of reads per barcode/internal barcode 
+
+NP_barcodes <- metadata$barcode
 internal_barcodes <- unique(data$V2)
 
 df <- data.frame(matrix(ncol=length(internal_barcodes),nrow=length(NP_barcodes)))
@@ -45,7 +49,21 @@ for(i in 1:nrow(df)){
 }
 
 df$total_reads_barcodes <- rowSums(df[1:length(internal_barcodes)])
-df$total_reads <- total$V1
+for(i in 1:nrow(df)){
+  idx <- which(total$V1==df$NP_barcode[i])
+  df$total_reads[i] <- total$V2[idx] 
+}
+
+df$time_point <- "" 
+df$replicate <- "" 
+
+for(i in 1:nrow(df)){
+	idx <- which(metadata$barcode==df$NP_barcode[i])
+	df$time_point[i] <- metadata[idx,"time_point"]
+	df$replicate[i] <- metadata[idx,"replicate"]
+
+}
+
 
 
 #make a normalised column per each of them 
@@ -65,6 +83,15 @@ df2$sample_id <- df$sample_id
 df2$concentration <- df$concentration
 df2$total_reads_barcodes <- df$total_reads_barcodes
 df2$total_reads <- df$total_reads
+df2$time_point <- "" 
+df2$replicate <- "" 
+
+for(i in 1:nrow(df2)){
+	idx <- which(metadata$barcode==df2$NP_barcode[i])
+	df2$time_point[i] <- metadata[idx,"time_point"]
+	df2$replicate[i] <- metadata[idx,"replicate"]
+
+}
 
 write.table(df2,file="table_proportions.txt",sep="\t",quote=F,row.names=F)
 
@@ -74,6 +101,15 @@ df3$sample_id <- df$sample_id
 df3$concentration <- df$concentration
 df3$total_reads_barcodes <- df$total_reads_barcodes
 df3$total_reads <- df$total_reads
+df3$time_point <- "" 
+df3$replicate <- "" 
+
+for(i in 1:nrow(df3)){
+	idx <- which(metadata$barcode==df3$NP_barcode[i])
+	df3$time_point[i] <- metadata[idx,"time_point"]
+	df3$replicate[i] <- metadata[idx,"replicate"]
+
+}
 
 write.table(df3,file="table_percentages.txt",sep="\t",quote=F,row.names=F)
 
@@ -140,13 +176,12 @@ timepoints <- unique(df3_nototal$time_point)
 a <- min(timepoints)
 b <- max(timepoints)
 
-ab <- unique(df3_nototal$sample_id)
+#ab <- unique(df3_nototal$sample_id)
 
-#for(i in 1:length(ab)){
-  #subset <- df3_nototal[which(df3_nototal$sample_id==ab[i]),]
-  #ggplot(subset,aes(x=concentration,y=mean,fill=variable) + geom_bar(position="stack",stat="identity") +
-  #theme_classic() 
-#}
+ggplot(summary_df3,aes(x=concentration,y=mean,fill=variable)) + geom_bar(position="stack",stat="identity") + 
+theme_classic() + facet_gri(~.sample_id)
+
+
 summary_df3.2 <- subset(summary_df3,select=-c(ci))
 write.table(summary_df3.2,file="summary_proportions.txt",sep="\t",quote=F,row.names=F)
 
