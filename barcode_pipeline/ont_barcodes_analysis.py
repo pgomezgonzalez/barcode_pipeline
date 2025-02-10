@@ -149,7 +149,7 @@ def cli():
 		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants"; done < list_bams''', shell=True)
 		#calculate coverage
 		print("***calculating coverage***")
-		sp.run(f'cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.bam >> coverage.bed"',shell=True)
+		sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.bam >> coverage.bed"''',shell=True)
 		sp.run(r'paste list_bams coverage.bed > coverage2.bed', shell=True)
 
 		if args.allow_missmatch:
