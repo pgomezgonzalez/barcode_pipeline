@@ -148,9 +148,9 @@ def cli():
 		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | awk '{print \$1}' >> read_ids_to_remove"; done < list_bams''', shell=True)
 		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants"; done < list_bams''', shell=True)
 		#calculate coverage
-		print("***calculating coverage***")
-		sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.bam >> coverage.bed"''',shell=True)
-		sp.run(r'paste list_bams coverage.bed > coverage2.bed', shell=True)
+		#print("***calculating coverage***")
+		#sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.bam >> coverage.bed"''',shell=True)
+		#sp.run(r'paste list_bams coverage.bed > coverage2.bed', shell=True)
 
 		if args.allow_missmatch:
 			#remove the reads that have picked up an internal barcode with exact match from bam file (into a different bam file called barcodeXX_rest.bam)
@@ -159,8 +159,8 @@ def cli():
 			sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line_rest.bam | agrep -1 {2} | wc -l >> count_reads_1missmatch"; done < list_bams''',shell=True)
 			sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line_rest'\t'{1} >> barcodes_variants_missmatch"; done < list_bams''', shell=True)
 			#calculate coverage
-			print("***calculating coverage***")
-			sp.run(f'cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}_rest.bam >> rest_coverage.bed"',shell=True)
+			#print("***calculating coverage***")
+			#sp.run(f'cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}_rest.bam >> rest_coverage.bed"',shell=True)
 
 	else:
 		sp.run(r'cat barcodes_used | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads1"', shell=True)
@@ -170,9 +170,9 @@ def cli():
 		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | awk '{print $1}' >> read_ids_to_remove"; done < barcodes_used''', shell=True)
 		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants"; done < barcodes_used''', shell=True)
 		#calculate coverage
-		print("***calculating coverage***")
-		sp.run(f'cat barcodes_used | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.bam >> coverage.bed"',shell=True)
-		sp.run(r'paste barcodes_used coverage.bed > coverage2.bed', shell=True)
+		#print("***calculating coverage***")
+		#sp.run(f'cat barcodes_used | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.bam >> coverage.bed"',shell=True)
+		#sp.run(r'paste barcodes_used coverage.bed > coverage2.bed', shell=True)
 		
 		if args.allow_missmatch:	
 			#remove the reads that have picked up an internal barcode with exact match from bam file (into a different bam file called barcodeXX_rest.bam)
@@ -181,8 +181,8 @@ def cli():
 			sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line_rest.bam | agrep -1 {2} | wc -l >> count_reads_1missmatch"; done < barcodes_used''',shell=True)
 			sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line_rest'\t'{1} >> barcodes_variants_missmatch"; done < barcodes_used''', shell=True)
 			#calculate coverage
-			print("***calculating coverage***")
-			sp.run(f'cat barcodes_used | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}_rest.bam >> rest_coverage.bed"',shell=True)
+			#print("***calculating coverage***")
+			#sp.run(f'cat barcodes_used | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}_rest.bam >> rest_coverage.bed"',shell=True)
 			
 	
 
