@@ -29,7 +29,7 @@ def cli():
 	argparser.add_argument("--skip-basecalling",action="store_true", help="Skip basecalling if the flag is provided")
 	argparser.add_argument("--only-basecalling",action="store_true", help="Only perform basecalling")
 	argparser.add_argument("--allow-missmatch", action="store_true", help="on reads where no exact match for internal barcodes has been found, allow for a missmatch")
-	argparser.add_argument("--missmatch",action="store_true", type=int, help="number of missmatches allowed",default=1)
+	argparser.add_argument("--missmatch",type=int, help="number of missmatches allowed",default=1)
 
 	args = argparser.parse_args()
 
