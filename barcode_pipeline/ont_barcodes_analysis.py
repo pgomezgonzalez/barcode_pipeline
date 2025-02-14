@@ -29,6 +29,7 @@ def cli():
 	argparser.add_argument("--skip-basecalling",action="store_true", help="Skip basecalling if the flag is provided")
 	argparser.add_argument("--only-basecalling",action="store_true", help="Only perform basecalling")
 	argparser.add_argument("--allow-missmatch", action="store_true", help="on reads where no exact match for internal barcodes has been found, allow for a missmatch")
+	argparser.add_argument("--missmatch",action="store_true", type=int, help="number of missmatches allowed",default=1)
 
 	args = argparser.parse_args()
 
@@ -113,6 +114,8 @@ def cli():
 		sp.run(r'paste list_demux_bams2 list_bams > list_all_bams_final',shell=True)
 		sp.run(f'Rscript {script_path}/barcodes_used.R {output_file}',shell=True)
 		sp.run(r'cat barcodes_used | parallel -j 1 "grep {} list_all_bams_final" > list_bams_final', shell=True)
+		#change name of barcodes_used to list_bams to be the same as in running basecalling
+		sp.run(r'mv barcodes_used list_bams', shell=True)
 		print("...filtering and creating fastqs...")
 		sp.run(r'''cat list_bams_final | parallel -j 1 --col-sep "\t" "samtools view -b -e '[qs]>=8' {1} | samtools fastq - | pigz -c > ./fastqs/{2}.fastq.gz"''',shell=True)
 
@@ -129,6 +132,13 @@ def cli():
 	sp.run(f'dorado aligner {args.ref_fasta} ./fastqs/ --output-dir ./mapping --emit-summary', shell=True)
 
 
+	##Calculate the number of total reads, mapped reads and unmapped reads 
+	sp.run(r'''cat list_bams | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads"''', shell=True)
+	sp.run(r'''cat list_bams | parallel -j 1 "samtools view -F4 ./mapping/{}.bam | wc -l >> mapped_reads"''', shell=True)
+	sp.run(r'''cat list_bams | parallel -j 1 "samtools view -f4 ./mapping/{}.bam | wc -l >> unmapped_reads"''', shell=True)
+	sp.run(r'paste list_bams total reads mapped reads unammaped_reads > table_number_reads', shell=True)
+
+
 	############################################################################################################################################################
 	############################################################################################################################################################
 	################################################################--------ANALYSIS------######################################################################
@@ -139,68 +149,46 @@ def cli():
 
 	shutil.copyfile(args.internal_barcodes,"internal_barcodes")
 
-	if not args.skip_basecalling:
-
-		sp.run(r'cat list_bams | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads1"', shell=True)
-		sp.run(r'paste list_bams total_reads1 > total_reads', shell=True)
-		print("...counting reads...")
-		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | wc -l >> count_reads"; done < list_bams''', shell=True)
-		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | awk '{print \$1}' >> read_ids_to_remove"; done < list_bams''', shell=True)
-		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants"; done < list_bams''', shell=True)
-		#calculate coverage
-		#print("***calculating coverage***")
-		#sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.bam >> coverage.bed"''',shell=True)
-		#sp.run(r'paste list_bams coverage.bed > coverage2.bed', shell=True)
-
-		if args.allow_missmatch:
-			#remove the reads that have picked up an internal barcode with exact match from bam file (into a different bam file called barcodeXX_rest.bam)
-			sp.run(r'cat list_bams | parallel -j 1 "samtools view -h ./mapping/{}.bam | grep -vf read_ids_to_remove | samtools view -bS -o ./mapping/{}_rest.bam"', shell=True)
-			#count reads allowing for a missmatch 
-			sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line_rest.bam | agrep -1 {2} | wc -l >> count_reads_1missmatch"; done < list_bams''',shell=True)
-			sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line_rest'\t'{1} >> barcodes_variants_missmatch"; done < list_bams''', shell=True)
-			#calculate coverage
-			#print("***calculating coverage***")
-			#sp.run(f'cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}_rest.bam >> rest_coverage.bed"',shell=True)
-
-	else:
-		sp.run(r'cat barcodes_used | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads1"', shell=True)
-		sp.run(r'paste barcodes_used total_reads1 > total_reads',shell=True)
-		print("...counting reads...")
-		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | wc -l >> count_reads"; done < barcodes_used''', shell=True)
-		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.bam | grep {2} | awk '{print $1}' >> read_ids_to_remove"; done < barcodes_used''', shell=True)
-		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants"; done < barcodes_used''', shell=True)
-		#calculate coverage
-		#print("***calculating coverage***")
-		#sp.run(f'cat barcodes_used | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.bam >> coverage.bed"',shell=True)
-		#sp.run(r'paste barcodes_used coverage.bed > coverage2.bed', shell=True)
-		
-		if args.allow_missmatch:	
-			#remove the reads that have picked up an internal barcode with exact match from bam file (into a different bam file called barcodeXX_rest.bam)
-			sp.run(r'cat barcodes_used | parallel -j 1 "samtools view -h ./mapping/{}.bam | grep -vf read_ids_to_remove | samtools view -bS -o ./mapping/{}_rest.bam"', shell=True)
-			#count reads allowing for a missmatch 
-			sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line_rest.bam | agrep -1 {2} | wc -l >> count_reads_1missmatch"; done < barcodes_used''',shell=True)
-			sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line_rest'\t'{1} >> barcodes_variants_missmatch"; done < barcodes_used''', shell=True)
-			#calculate coverage
-			#print("***calculating coverage***")
-			#sp.run(f'cat barcodes_used | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}_rest.bam >> rest_coverage.bed"',shell=True)
-			
+	##create bam files excluding unmapped reads 
+	sp.run(r'''cat list_bams | parallel -j 1 "samtools view -F4 ./mapping/{}.bam > ./mapping/{}.mapped.bam''',shell=True)
 	
+	print("...counting reads...")
 
-	
+	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.mapped.bam | grep {2} | wc -l >> barcode_read_count"; done < list_bams''', shell=True)
+	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mappint/$line.mapped.bam | grep {2} | awk '{print \$1}' >> read_ids_with_barcode"; done < list_bams''', shell=True)
+	sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line '\t'{1} >> barcodes_variants"; done < list_bams''',shell=True)
+
+	##CALCULATE COVERAGE???? 
+	#calculate coverage
+	#print("***calculating coverage***")
+	#sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.bam >> coverage.bed"''',shell=True)
+	#sp.run(r'paste list_bams coverage.bed > coverage2.bed', shell=True)
+
 	if args.allow_missmatch:
-		sp.run(r'paste barcodes_variants barcodes_variants_missmatch count_reads > count_reads_internal_barcodes.csv', shell=True)
-		sp.run(r'paste coverage2.bed rest_coverage.bed > barcodes_coverage.bed', shell=True)
+		#remove the reads that have picked up an internal barcode with exact match from bam file (into a different bam file called barcodeXX_rest.bam)
+		sp.run(r'cat list_bams | parallel -j 1 "samtools view -h ./mapping/{}.bam | grep -vf read_ids_to_remove | samtools view -bS -o ./mapping/{}_rest.bam"', shell=True)
+		#count reads allowing for a missmatch 
+		sp.run(f'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line_rest.bam | agrep -n {args.missmatch} {2} | wc -l >> count_reads_missmatch"; done < list_bams''',shell=True)
+		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line_rest'\t'{1} >> barcodes_variants_missmatch"; done < list_bams''', shell=True)
+		#calculate coverage
+		#print("***calculating coverage***")
+		#sp.run(f'cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}_rest.bam >> rest_coverage.bed"',shell=True)
+
+		sp.run(r'paste barcodes_variants barcode_read_count count_reads_missmatch > count_reads_internal_barcodes',shell=True)
+		#	sp.run(r'paste coverage2.bed rest_coverage.bed > barcodes_coverage.bed', shell=True)
+
 	else:
-		sp.run(r'paste barcodes_variants count_reads > count_reads_internal_barcodes.csv', shell=True)
-		sp.run(r'cp coverage2.bed barcodes_coverage.bed', shell=True)
-	
+		sp.run(r'paste barcodes_variants barcode_read_count > count_reads_internal_barcodes',shell=True)
+		#sp.run(r'cp coverage2.bed barcodes_coverage.bed', shell=True)
+
+
 
 	#Run Rscript to create plots and tables 
 	print("...generating tables and plots...")
 	sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes.csv total_reads {output_file} barcodes_coverage.bed', shell=True)
 
 	###Remove temporary files 
-	sp.run(r'rm list_bams list_demux_bams2 list_all_bams_final list_bams_final total_reads count_reads barcodes_variants count_reads_internal_barcodes.csv', shell=True)
+	#sp.run(r'rm list_bams list_demux_bams2 list_all_bams_final list_bams_final total_reads count_reads barcodes_variants count_reads_internal_barcodes.csv', shell=True)
 
 	###Rename files with prefix of the run to differentiate 
 	sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
