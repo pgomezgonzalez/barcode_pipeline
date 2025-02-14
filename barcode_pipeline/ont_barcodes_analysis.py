@@ -155,7 +155,7 @@ def cli():
 	print("...counting reads...")
 
 	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.mapped.bam | grep {2} | wc -l >> barcode_read_count"; done < list_bams''', shell=True)
-	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mappint/$line.mapped.bam | grep {2} | awk '{print \$1}' >> read_ids_with_barcode"; done < list_bams''', shell=True)
+	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.mapped.bam | grep {2} | awk '{print \$1}' >> read_ids_with_barcode"; done < list_bams''', shell=True)
 	sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line '\t'{1} >> barcodes_variants"; done < list_bams''',shell=True)
 
 	##CALCULATE COVERAGE???? 
