@@ -136,7 +136,7 @@ def cli():
 	sp.run(r'''cat list_bams | parallel -j 1 "samtools view ./mapping/{}.bam | wc -l >> total_reads"''', shell=True)
 	sp.run(r'''cat list_bams | parallel -j 1 "samtools view -F4 ./mapping/{}.bam | wc -l >> mapped_reads"''', shell=True)
 	sp.run(r'''cat list_bams | parallel -j 1 "samtools view -f4 ./mapping/{}.bam | wc -l >> unmapped_reads"''', shell=True)
-	sp.run(r'paste list_bams total reads mapped reads unammaped_reads > table_number_reads', shell=True)
+	sp.run(r'paste list_bams total_reads mapped_reads unammaped_reads > table_number_reads', shell=True)
 
 
 	############################################################################################################################################################
@@ -150,7 +150,8 @@ def cli():
 	shutil.copyfile(args.internal_barcodes,"internal_barcodes")
 
 	##create bam files excluding unmapped reads 
-	sp.run(r'''cat list_bams | parallel -j 1 "samtools view -F4 ./mapping/{}.bam > ./mapping/{}.mapped.bam''',shell=True)
+	print("...creating mapped bam files...")
+	sp.run(r'''cat list_bams | parallel -j 1 "samtools view -F4 ./mapping/{}.bam > ./mapping/{}.mapped.bam"''',shell=True)
 	
 	print("...counting reads...")
 
