@@ -167,7 +167,7 @@ def cli():
 
 	if args.allow_missmatch:
 		#remove the reads that have picked up an internal barcode with exact match from bam file (into a different bam file called barcodeXX_rest.bam)
-		sp.run(r'cat list_bams | parallel -j 1 "samtools view -h ./mapping/{}.bam | grep -vf read_ids_to_remove | samtools view -bS -o ./mapping/{}_rest.bam"', shell=True)
+		sp.run(r'cat list_bams | parallel -j 1 "samtools view -h ./mapping/{}.bam | grep -vf read_ids_with_barcode | samtools view -bS -o ./mapping/{}_rest.bam"', shell=True)
 		#count reads allowing for a missmatch 
 		sp.run(f'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line_rest.bam | agrep -n {args.missmatch} {2} | wc -l >> count_reads_missmatch"; done < list_bams''',shell=True)
 		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line_rest'\t'{1} >> barcodes_variants_missmatch"; done < list_bams''', shell=True)
@@ -186,7 +186,7 @@ def cli():
 
 	#Run Rscript to create plots and tables 
 	print("...generating tables and plots...")
-	sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes.csv total_reads {output_file} barcodes_coverage.bed', shell=True)
+	sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes total_reads {output_file} barcodes_coverage.bed', shell=True)
 
 	###Remove temporary files 
 	#sp.run(r'rm list_bams list_demux_bams2 list_all_bams_final list_bams_final total_reads count_reads barcodes_variants count_reads_internal_barcodes.csv', shell=True)
