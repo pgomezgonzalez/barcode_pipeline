@@ -162,12 +162,12 @@ def cli():
 	######################-----CALCULATE COVERAGE-----########################
 	#calculate coverage
 	print("***____calculating coverage____***")
-	#sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.mapped.bam >> coverage.bed"''',shell=True)
-	#sp.run(r'paste list_bams coverage.bed > mean_coverage.bed', shell=True)
+	sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{{}}.mapped.bam >> coverage.bed"''',shell=True)
+	sp.run(r'paste list_bams coverage.bed > mean_coverage.bed', shell=True)
 	#Calculate coverage at each position and make plots 
-	#sp.run(r'mkdir coverage', shell=True)
-	#sp.run(f'''cat list_bams | parallel -j 1 --col-sep "\t" "bedtools genomecov -ibam ./mapping/{}.mapped.bam > ./coverage/{}_cov.bed''', shell=True)
-	#sp.run(f'Rscript {script_path}/coverage_plot.R {output_file}', shell=True) ##creates coverage line plots for the amplicon region 
+	sp.run(r'mkdir coverage', shell=True)
+	sp.run(r'''cat list_bams | parallel -j 1 --col-sep "\t" "bedtools genomecov -ibam ./mapping/{}.mapped.bam > ./coverage/{}_cov.bed''', shell=True)
+	sp.run(f'Rscript {script_path}/coverage_plot.R {output_file}', shell=True) ##creates coverage line plots for the amplicon region 
 
 
 	if args.allow_missmatch:

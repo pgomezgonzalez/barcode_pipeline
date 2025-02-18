@@ -17,11 +17,11 @@ library(dplyr)
 library(openxlsx)
 
 
-#read data of count reads (should be called count_reads_internal_barcodes.csv and be tab delimited file with 3 columns (barcode,variant_id and read_count))
+#read data of count reads (should be called count_reads_internal_barcodes.csv and be tab delimited file with 3 or 4 columns (barcode,variant_id and read_count/read _count_missmatch))
 
 data <- read.table(args[1],sep="\t",header=F,stringsAsFactors=FALSE)
 
-#read total number of counts per barcode (2 columns)
+#read table with barcode, total number of reads, mapped reads, and unmapped reads 
 total <- read.table(args[2],sep="\t",header=F,stringsAsFactors=FALSE)
 
 #read metadata file 
