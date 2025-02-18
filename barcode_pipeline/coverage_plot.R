@@ -6,7 +6,7 @@ args = commandArgs(trailingOnly=TRUE)
 cov_files <- list.files(path="./coverage/",pattern="*_coverage.bed")
 
 list_cov <- lapply(cov_files,read.table)
-names(list_cov) <- sub("_coverage.bed","",cov_files)
+names(list_cov) <- sub(".cov.bed","",cov_files)
 
 metadata <- read.table(args[1],sep="\t",header=T,stringsAsFactors=F)
 
