@@ -161,10 +161,13 @@ def cli():
 
 	######################-----CALCULATE COVERAGE-----########################
 	#calculate coverage
-	#print("***____calculating coverage____***")
+	print("***____calculating coverage____***")
 	#sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.mapped.bam >> coverage.bed"''',shell=True)
-	#sp.run(r'paste list_bams coverage.bed > coverage2.bed', shell=True)
+	#sp.run(r'paste list_bams coverage.bed > mean_coverage.bed', shell=True)
 	#Calculate coverage at each position and make plots 
+	#sp.run(r'mkdir coverage', shell=True)
+	#sp.run(f'''cat list_bams | parallel -j 1 --col-sep "\t" "bedtools genomecov -ibam ./mapping/{}.mapped.bam > ./coverage/{}_cov.bed''', shell=True)
+	#sp.run(f'Rscript {script_path}/coverage_plot.R {output_file}', shell=True) ##creates coverage line plots for the amplicon region 
 
 
 	if args.allow_missmatch:
@@ -172,11 +175,11 @@ def cli():
 		sp.run(r'cat list_bams | parallel -j 1 "samtools view -h ./mapping/{}.mapped.bam | grep -vf read_ids_with_barcode | samtools view -bS -o ./mapping/{}_rest.bam"', shell=True)
 		#count reads allowing for a missmatch 
 
-		sp.run(f'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line_rest.bam | agrep -n {args.missmatch} {2} | wc -l >> count_reads_missmatch"; done < list_bams''',shell=True)
+		sp.run(f'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view -h ./mapping/$line_rest.bam | agrep -n {args.missmatch} {2} - | wc -l >> count_reads_missmatch"; done < list_bams''',shell=True)
 		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line_rest'\t'{1} >> barcodes_variants_missmatch"; done < list_bams''', shell=True)
 		
 		sp.run(r'paste barcodes_variants barcode_read_count count_reads_missmatch > count_reads_internal_barcodes',shell=True)
-		#	sp.run(r'paste coverage2.bed rest_coverage.bed > barcodes_coverage.bed', shell=True)
+		#sp.run(r'paste coverage2.bed rest_coverage.bed > barcodes_coverage.bed', shell=True)
 
 	else:
 		sp.run(r'paste barcodes_variants barcode_read_count > count_reads_internal_barcodes',shell=True)
