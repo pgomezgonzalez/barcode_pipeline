@@ -175,16 +175,14 @@ def cli():
 		sp.run(r'cat list_bams | parallel -j 1 "samtools view -h ./mapping/{}.mapped.bam | grep -vf read_ids_with_barcode | samtools view -bS -o ./mapping/{}_rest.bam"', shell=True)
 		#count reads allowing for a missmatch 
 
-		sp.run(f'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view -h ./mapping/$line_rest.bam | agrep -n {args.missmatch} {2} - | wc -l >> count_reads_missmatch"; done < list_bams''',shell=True)
+		sp.run(f'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view -h ./mapping/${{line}}_rest.bam | agrep -n{args.missmatch} {{2}} - | wc -l >> count_reads_missmatch"; done < list_bams''',shell=True)
 		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line_rest'\t'{1} >> barcodes_variants_missmatch"; done < list_bams''', shell=True)
 		
 		sp.run(r'paste barcodes_variants barcode_read_count count_reads_missmatch > count_reads_internal_barcodes',shell=True)
-		#sp.run(r'paste coverage2.bed rest_coverage.bed > barcodes_coverage.bed', shell=True)
 
 	else:
 		sp.run(r'paste barcodes_variants barcode_read_count > count_reads_internal_barcodes',shell=True)
-		#sp.run(r'cp coverage2.bed barcodes_coverage.bed', shell=True)
-
+		
 
 
 	#Run Rscript to create plots and tables 
