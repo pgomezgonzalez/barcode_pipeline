@@ -161,9 +161,9 @@ def cli():
 
 	######################-----CALCULATE COVERAGE-----########################
 	#calculate coverage
-	print("***____calculating coverage____***")
-	sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.mapped.bam >> coverage.bed"''',shell=True)
-	sp.run(r'paste list_bams coverage.bed > coverage2.bed', shell=True)
+	#print("***____calculating coverage____***")
+	#sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.mapped.bam >> coverage.bed"''',shell=True)
+	#sp.run(r'paste list_bams coverage.bed > coverage2.bed', shell=True)
 	#Calculate coverage at each position and make plots 
 
 
