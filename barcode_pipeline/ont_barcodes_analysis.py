@@ -159,23 +159,22 @@ def cli():
 	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.mapped.bam | grep {2} | awk '{print \$1}' >> read_ids_with_barcode"; done < list_bams''', shell=True)
 	sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line '\t'{1} >> barcodes_variants"; done < list_bams''',shell=True)
 
-	##CALCULATE COVERAGE???? 
+	######################-----CALCULATE COVERAGE-----########################
 	#calculate coverage
-	#print("***calculating coverage***")
-	#sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.bam >> coverage.bed"''',shell=True)
-	#sp.run(r'paste list_bams coverage.bed > coverage2.bed', shell=True)
+	print("***____calculating coverage____***")
+	sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}.mapped.bam >> coverage.bed"''',shell=True)
+	sp.run(r'paste list_bams coverage.bed > coverage2.bed', shell=True)
+	#Calculate coverage at each position and make plots 
+
 
 	if args.allow_missmatch:
 		#remove the reads that have picked up an internal barcode with exact match from bam file (into a different bam file called barcodeXX_rest.bam)
 		sp.run(r'cat list_bams | parallel -j 1 "samtools view -h ./mapping/{}.mapped.bam | grep -vf read_ids_with_barcode | samtools view -bS -o ./mapping/{}_rest.bam"', shell=True)
 		#count reads allowing for a missmatch 
 
-		sp.run(f'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line_rest.bam | agrep -n str({args.missmatch}) {2} | wc -l >> count_reads_missmatch"; done < list_bams''',shell=True)
+		sp.run(f'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line_rest.bam | agrep -n {args.missmatch} {2} | wc -l >> count_reads_missmatch"; done < list_bams''',shell=True)
 		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line_rest'\t'{1} >> barcodes_variants_missmatch"; done < list_bams''', shell=True)
-		#calculate coverage
-		#print("***calculating coverage***")
-		#sp.run(f'cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{}_rest.bam >> rest_coverage.bed"',shell=True)
-
+		
 		sp.run(r'paste barcodes_variants barcode_read_count count_reads_missmatch > count_reads_internal_barcodes',shell=True)
 		#	sp.run(r'paste coverage2.bed rest_coverage.bed > barcodes_coverage.bed', shell=True)
 
