@@ -26,6 +26,8 @@ def cli():
 	argparser.add_argument("internal_barcodes", help="file with internal barcodes and variant_id")
 	argparser.add_argument("region_bed", help="bed file with region where internal barcodes are")
 	argparser.add_argument("prefix", help="prefix for all the results files")
+	argparser.add_argument("start_ip",help="start position internal barcode - relative to amplicon reference")
+	argparser.add_argument("end_ip",help="end position internal barcode - relative to amplicon reference")
 	argparser.add_argument("--skip-basecalling",action="store_true", help="Skip basecalling if the flag is provided")
 	argparser.add_argument("--only-basecalling",action="store_true", help="Only perform basecalling")
 	argparser.add_argument("--allow-missmatch", action="store_true", help="on reads where no exact match for internal barcodes has been found, allow for a missmatch")
@@ -159,15 +161,15 @@ def cli():
 	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.mapped.bam | grep {2} | awk '{print \$1}' >> read_ids_with_barcode"; done < list_bams''', shell=True)
 	sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line '\t'{1} >> barcodes_variants"; done < list_bams''',shell=True)
 
-	######################-----CALCULATE COVERAGE-----########################
+	#############################################################################-----CALCULATE COVERAGE-----###############################################################################
 	#calculate coverage
 	print("***____calculating coverage____***")
 	sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{{}}.mapped.bam >> coverage.bed"''',shell=True)
 	sp.run(r'paste list_bams coverage.bed > mean_coverage.bed', shell=True)
 	#Calculate coverage at each position and make plots 
 	sp.run(r'mkdir coverage', shell=True)
-	sp.run(r'''cat list_bams | parallel -j 1 --col-sep "\t" "bedtools genomecov -ibam ./mapping/{}.mapped.bam > ./coverage/{}.cov.bed"''', shell=True)
-	sp.run(f'Rscript {script_path}/coverage_plot.R {output_file}', shell=True) ##creates coverage line plots for the amplicon region 
+	sp.run(r'''cat list_bams | parallel -j 1 --col-sep "\t" "bedtools genomecov -d -ibam ./mapping/{}.mapped.bam > ./coverage/{}.cov.bed"''', shell=True)
+	sp.run(f'Rscript {script_path}/coverage_plot.R {output_file} {args.start_ip} {args.end_ip}', shell=True) ##creates coverage line plots for the amplicon region 
 
 
 	if args.allow_missmatch:
