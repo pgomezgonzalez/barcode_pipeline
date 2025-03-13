@@ -23,8 +23,8 @@ def cli():
 	argparser.add_argument("data", help="the data directory (folder with all pod5 files)")
 	argparser.add_argument("output", help="name of output bam file")
 	argparser.add_argument("ref_fasta", help="reference gene")
-	argparser.add_argument("internal_barcodes", help="file with internal barcodes and variant_id")
-	argparser.add_argument("region_bed", help="bed file with region where internal barcodes are")
+	argparser.add_argument("internal_barcodes", help="file with internal barcodes and variant_id (example in internal_barcodes_template.xlsx)")
+	argparser.add_argument("region_bed", help="bed file with region where internal barcodes are (example in region_template.bed)")
 	argparser.add_argument("prefix", help="prefix for all the results files")
 	argparser.add_argument("--skip-basecalling",action="store_true", help="Skip basecalling if the flag is provided")
 	argparser.add_argument("--only-basecalling",action="store_true", help="Only perform basecalling")
@@ -34,7 +34,7 @@ def cli():
 	args = argparser.parse_args()
 
 	#function to convert xlsx file to txt tab del
-	def convert_xlsx_to_txt(file_name):
+	def convert_xlsx_to_txt(file_name,output_file):
 		#check if it's xlsx 
 		if file_name.lower().endswith('.xlsx'):
 			print(f"Converting {file_name} to tab-delimited .txt file...")
@@ -157,7 +157,8 @@ def cli():
 	##One mapped, we can extract the number of reads per barcode for each internal barcode 
 	##We need a file with internal barcodes and variant_id called internal_barcodes.txt
 
-	shutil.copyfile(args.internal_barcodes,"internal_barcodes")
+	internal_barcodes_txt = convert_xlsx_to_txt(args.internal_barcodes)
+	shutil.copyfile(internal_barcodes_txt,"internal_barcodes")
 
 	##create bam files excluding unmapped reads 
 	print("...creating mapped bam files...")
@@ -207,7 +208,7 @@ def cli():
 	sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
 	sp.run(f'mv barplot_barcodes.png {args.prefix}.barplot_barcodes.png', shell=True)
 	sp.run(f'mv results.xlsx {args.prefix}.results.xlsx',shell=True)
-	sp.run(f'mv table_reads.txt {args.prefix}.table_reads.txt', shell=True)
+	sp.run(f'mv table_reads.txt {args.prefix}.table_reads.txt', shell=True) 
 	sp.run(f'mv table_proportions.txt {args.prefix}.table_proportions.txt', shell=True)
 	sp.run(f'mv table_percentages.txt {args.prefix}.table_percentages.txt', shell=True)
 	sp.run(f'mv internal_barcodes {args.prefix}.internal_barcodes', shell=True)

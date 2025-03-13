@@ -218,41 +218,41 @@ write.xlsx(list_results,file="results.xlsx")
 # plus everything else with different concentrations 
 ##curate the table for it
 #add the time_point 0 - control for all sample_id 
-summary_df3.3 <- summary_df3 
-zero_tp <- summary_df3[which(summary_df3$time_point==0),]
-sample_ids <- unique(summary_df3$sample_id)
+#summary_df3.3 <- summary_df3 
+#zero_tp <- summary_df3[which(summary_df3$time_point==0),]
+#sample_ids <- unique(summary_df3$sample_id)
 
-list_zero_tps <- list()
-for(i in 1:length(sample_ids)){
-  zero_tp_i <- zero_tp
-  zero_tp_i$sample_id <- sample_ids[i]
-  list_zero_tps[[i]] <- zero_tp_i  
-}
+#list_zero_tps <- list()
+#for(i in 1:length(sample_ids)){
+#  zero_tp_i <- zero_tp
+#  zero_tp_i$sample_id <- sample_ids[i]
+#  list_zero_tps[[i]] <- zero_tp_i  
+#}
 
-toremove <- which(summary_df3$time_point==0)
-summary_df3.3 <- summary_df3.3[-toremove,]
-list_zero_tps_df <- do.call("rbind",list_zero_tps)
-summary_df3.3 <- rbind(summary_df3.3,list_zero_tps_df)
+#toremove <- which(summary_df3$time_point==0)
+#summary_df3.3 <- summary_df3.3[-toremove,]
+#list_zero_tps_df <- do.call("rbind",list_zero_tps)
+#summary_df3.3 <- rbind(summary_df3.3,list_zero_tps_df)
 
-ggplot(summary_df3.3,aes(x=time_point,y=mean,col=variable)) + geom_point(size=2) + geom_line() + 
-geom_errorbar(aes(ymin=mean-sd,ymax=mean-sd),colour="black",width=.2) + theme_classic() + scale_color_viridis(discrete=TRUE) +
-labs(x="Time point",y="Proportion of reads",colour="Variant") + scale_x_continuous(breaks=seq(a,b,by=1)) +
-facet_wrap(.~interaction(sample_id,concentration))
+#ggplot(summary_df3.3,aes(x=time_point,y=mean,col=variable)) + geom_point(size=2) + geom_line() + 
+#geom_errorbar(aes(ymin=mean-sd,ymax=mean-sd),colour="black",width=.2) + theme_classic() + scale_color_viridis(discrete=TRUE) +
+#labs(x="Time point",y="Proportion of reads",colour="Variant") + scale_x_continuous(breaks=seq(a,b,by=1)) +
+#facet_wrap(.~interaction(sample_id,concentration))
 
 
-ggplot(summary_df3,aes(x=time_point,y=mean,col=variable)) + geom_point(size=2) + geom_line() + 
-geom_errorbar(aes(ymin=mean-sd,ymax=mean+sd),colour="black",width=.2) + theme_classic() +
-labs(x="Time point", y="Proportion of reads",colour="Internal barcode",title="Mean percentage of reads in each pool mapping to each internal barcode") + 
-scale_x_continuous(breaks=seq(a,b,by=1))
+#ggplot(summary_df3,aes(x=time_point,y=mean,col=variable)) + geom_point(size=2) + geom_line() + 
+#geom_errorbar(aes(ymin=mean-sd,ymax=mean+sd),colour="black",width=.2) + theme_classic() +
+#labs(x="Time point", y="Proportion of reads",colour="Internal barcode",title="Mean percentage of reads in each pool mapping to each internal barcode") + 
+#scale_x_continuous(breaks=seq(a,b,by=1))
 
-ggsave("lineplot_barcodes.png")
+#ggsave("lineplot_barcodes.png")
 
 
 ##Make barplot
-ggplot(summary_df3,aes(x=time_point,y=mean,fill=variable)) + geom_bar(position="stack",stat="identity") +
-theme_classic() + labs(x="Time point",y="Proportion of reads",fill="Internal barcode") 
+#ggplot(summary_df3,aes(x=time_point,y=mean,fill=variable)) + geom_bar(position="stack",stat="identity") +
+#theme_classic() + labs(x="Time point",y="Proportion of reads",fill="Internal barcode") 
 
-ggsave("barplot_barcodes.png")
+#ggsave("barplot_barcodes.png")
 
 
 
