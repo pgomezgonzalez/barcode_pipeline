@@ -19,7 +19,7 @@ def cli():
 
 	argparser.add_argument("metadata",help="metadata with experiment_id, nanopore_run_id, flow_cell_id, kit_id, sample_id, barcode, alias, concentration, time_point, replicate (example in metadata_template.xlsx)")
 	#argparser.add_argument("sample_sheet",help="name of sample sheet for dorado basecalling")
-	argparser.add_argument("kit_name", help="name of the kit used")
+	#argparser.add_argument("kit_name", help="name of the kit used")
 	argparser.add_argument("data", help="the data directory (folder with all pod5 files)")
 	argparser.add_argument("output", help="name of output bam file")
 	argparser.add_argument("ref_fasta", help="reference gene")
@@ -67,7 +67,7 @@ def cli():
 
 	output_file = convert_xlsx_to_txt(args.metadata)
 	kit_name = get_kit_name(args.metadata)
-	print kit_name
+	print(kit_name)
 
 	sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
 	
