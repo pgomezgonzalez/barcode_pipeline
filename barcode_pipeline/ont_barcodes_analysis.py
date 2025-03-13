@@ -57,12 +57,9 @@ def cli():
 			print(f"Directory '{directory_name}' already exists")
 
 	def get_kit_name(metadata_file):
-		with open(metadata_file, 'r') as file:
-			first_line = file.readline().strip()
-			columns = first_line.split('\t')
-			if len(columns) >= 4:
-				kit_name=columns[3]
-				return kit_name
+		df = pd.read_csv(metadata_file, sep='\t')
+			kit_name = print(df.iloc[1,3])
+			return kit_name
 
 
 	output_file = convert_xlsx_to_txt(args.metadata)
