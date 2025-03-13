@@ -3,7 +3,7 @@
 
 args = commandArgs(trailingOnly=TRUE)
 
-pkgs <- c("ggplot2","reshape2","plyr","dplyr","openxlsx")
+pkgs <- c("ggplot2","reshape2","plyr","dplyr","openxlsx","viridis")
 
 installed_packages <- pkgs %in% rownames(installed.packages())
 if(any(installed_packages==FALSE)){
@@ -15,6 +15,7 @@ library(reshape2)
 library(plyr)
 library(dplyr)
 library(openxlsx)
+library(viridis)
 
 
 #read data of count reads (should be called count_reads_internal_barcodes and be tab delimited file with 3 or 4 columns (barcode,variant_id and read_count/read _count_missmatch))
@@ -43,7 +44,11 @@ df$concentration <- metadata$concentration
 
 for(i in 1:nrow(df)){
 	subset <- data[which(data$V1==df$NP_barcode[i]),]
-	reads <- subset$V3
+	if(length(data)==4){
+    reads <- subset$V3 + subset$V4
+  }else{
+    reads <- subset$V3
+  }
 	df[i,1:length(internal_barcodes)] <- reads
 }
 
@@ -62,7 +67,6 @@ for(i in 1:nrow(df)){
 	idx <- which(metadata$barcode==df$NP_barcode[i])
 	df$time_point[i] <- metadata[idx,"time_point"]
 	df$replicate[i] <- metadata[idx,"replicate"]
-
 }
 
 
@@ -177,17 +181,64 @@ timepoints <- unique(df3_nototal$time_point)
 a <- min(timepoints)
 b <- max(timepoints)
 
-#ab <- unique(df3_nototal$sample_id)
+#Make barplots for proportion of reads 
+
+#calculate the number of rows and columns we want based on the number of variables (variables = antibodies/control)
+#We can make it be between 5 and 8 
+
+ab <- length(unique(summary_df3$sample_id)) ## number of antibodies and control used 
+
+if(ab %% 6 == 0){
+  plot_rows <- ab/6
+  plot_cols <- 6
+}else{
+  plot_rows <- ceiling(ab/6)
+  plot_cols <- 6
+}
+
+##Make bar plot 
 
 ggplot(summary_df3,aes(x=concentration,y=mean,fill=variable)) + geom_bar(position="stack",stat="identity") + 
-theme_classic() + facet_gri(~.sample_id)
+theme_classic() + scale_fill_viridis(discrete=TRUE) + facet_wrap(.~sample_id,ncol=plot_cols,nrow=plot_rows) +
+labs(x="Concentration of antibody",y="Mean proportion of reads",fill="Variant")
 
+plot_height <- 3.5*plot_rows
+
+ggsave("barplot_barcodes.png",width=12,height=plot_height)
 
 summary_df3.2 <- subset(summary_df3,select=-c(ci))
 write.table(summary_df3.2,file="summary_proportions.txt",sep="\t",quote=F,row.names=F)
 
 list_results <- list("reads" = df, "proportions" = df2, "percentages" = df3, "percentages_long" = df3_melt, "summary" = summary_df3.2)
 write.xlsx(list_results,file="results.xlsx")
+
+
+##Make a line plot 
+#The time point 0 is only for the controls with concentration 0, then time point 1 is for controls 
+# plus everything else with different concentrations 
+##curate the table for it
+#add the time_point 0 - control for all sample_id 
+summary_df3.3 <- summary_df3 
+zero_tp <- summary_df3[which(summary_df3$time_point==0),]
+sample_ids <- unique(summary_df3$sample_id)
+
+list_zero_tps <- list()
+for(i in 1:length(sample_ids)){
+  zero_tp_i <- zero_tp
+  zero_tp_i$sample_id <- sample_ids[i]
+  list_zero_tps[[i]] <- zero_tp_i  
+}
+
+toremove <- which(summary_df3$time_point==0)
+summary_df3.3 <- summary_df3.3[-toremove,]
+list_zero_tps_df <- do.call("rbind",list_zero_tps)
+summary_df3.3 <- rbind(summary_df3.3,list_zero_tps_df)
+
+ggplot(summary_df3.3,aes(x=time_point,y=mean,col=variable)) + geom_point(size=2) + geom_line() + 
+geom_errorbar(aes(ymin=mean-sd,ymax=mean-sd),colour="black",width=.2) + theme_classic() + scale_color_viridis(discrete=TRUE) +
+labs(x="Time point",y="Proportion of reads",colour="Variant") + scale_x_continuous(breaks=seq(a,b,by=1)) +
+facet_wrap(.~interaction(sample_id,concentration))
+
 
 ggplot(summary_df3,aes(x=time_point,y=mean,col=variable)) + geom_point(size=2) + geom_line() + 
 geom_errorbar(aes(ymin=mean-sd,ymax=mean+sd),colour="black",width=.2) + theme_classic() +
