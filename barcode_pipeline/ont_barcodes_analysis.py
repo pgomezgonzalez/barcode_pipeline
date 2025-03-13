@@ -58,8 +58,8 @@ def cli():
 
 	def get_kit_name(metadata_file):
 		df = pd.read_csv(metadata_file, sep='\t')
-			kit_name = print(df.iloc[1,3])
-			return kit_name
+		kit_name = print(df.iloc[1,3])
+		return kit_name
 
 
 	output_file = convert_xlsx_to_txt(args.metadata)
