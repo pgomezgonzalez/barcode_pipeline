@@ -34,7 +34,7 @@ def cli():
 	args = argparser.parse_args()
 
 	#function to convert xlsx file to txt tab del
-	def convert_xlsx_to_txt(file_name,output_file):
+	def convert_xlsx_to_txt(file_name):
 		#check if it's xlsx 
 		if file_name.lower().endswith('.xlsx'):
 			print(f"Converting {file_name} to tab-delimited .txt file...")
