@@ -17,8 +17,8 @@ def cli():
 
 	argparser = argparse.ArgumentParser(description="Basecalling and demultiplexing of ONT pod5 data with dorado followed by internal barcodes analysis")
 
-	argparser.add_argument("metadata",help="metadata with experiment_id,flow_cell_id,kit_id,barcode,alias,time_point,replicate")
-	argparser.add_argument("sample_sheet",help="name of sample sheet for dorado basecalling")
+	argparser.add_argument("metadata",help="metadata with experiment_id, nanopore_run_id, flow_cell_id, kit_id, sample_id, barcode, alias, concentration, time_point, replicate (example in metadata_template.xlsx)")
+	#argparser.add_argument("sample_sheet",help="name of sample sheet for dorado basecalling")
 	argparser.add_argument("kit_name", help="name of the kit used")
 	argparser.add_argument("data", help="the data directory (folder with all pod5 files)")
 	argparser.add_argument("output", help="name of output bam file")
@@ -56,16 +56,25 @@ def cli():
 		else:
 			print(f"Directory '{directory_name}' already exists")
 
+	def get_kit_name(metadata_file):
+		with open(metadata_file, 'r') as file:
+			first_line = file.readline().strip()
+			columns = first_line.split('\t')
+			if len(columns) >= 4:
+				kit_name=columns[3]
+				return kit_name
 
 
 	output_file = convert_xlsx_to_txt(args.metadata)
+	kit_name = get_kit_name(args.metadata)
+	print kit_name
 
 	sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
-
+	
 	if not args.skip_basecalling:
 		##Make sample_sheet from metadata 
 		print("*****Generating sample sheet*****")
-		sp.run(f'Rscript {script_path}/make_dorado_samplesheet.R {output_file} {args.sample_sheet}', shell=True)
+		sp.run(f'Rscript {script_path}/make_dorado_samplesheet.R {output_file} sample_sheet', shell=True)
 
 	############################################################################################################################################################
 	############################################################################################################################################################
@@ -73,7 +82,7 @@ def cli():
 
 		#Run dorado basecaller 
 		print("...starting basecalling...")
-		sp.run(f'dorado basecaller --min-qscore 10 --kit-name {args.kit_name} --sample-sheet {args.sample_sheet}.csv -r sup {args.data} > {args.output}.bam', shell=True)
+		sp.run(f'dorado basecaller --min-qscore 10 --kit-name {kit_name} --sample-sheet sample_sheet.csv -r sup {args.data} > {args.output}.bam', shell=True)
 
 		if args.only_basecalling:
 			sys.exit("...basecalling finished...EXITING...")
