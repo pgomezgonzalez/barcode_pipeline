@@ -195,10 +195,11 @@ def cli():
 	sp.run(f'Rscript {script_path}/coverage_plot.R {output_file} {args.region_bed}', shell=True) ##creates coverage line plots for the amplicon region 
 
 
+	#######################################################################-----MAKE RESULTS TABLE AND PLOTS-----############################################################################
 
 	#Run Rscript to create plots and tables 
 	print("...generating tables and plots...")
-	sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes total_reads {output_file}', shell=True)
+	sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes table_number_reads {output_file}', shell=True)
 
 	###Remove temporary files 
 	#sp.run(r'rm list_bams list_demux_bams2 list_all_bams_final list_bams_final total_reads count_reads barcodes_variants count_reads_internal_barcodes.csv', shell=True)
