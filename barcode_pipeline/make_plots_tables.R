@@ -21,15 +21,18 @@ library(viridis)
 #read data of count reads (should be called count_reads_internal_barcodes and be tab delimited file with 3 or 4 columns (barcode,variant_id and read_count/read _count_missmatch))
 
 data <- read.table(args[1],sep="\t",header=F,stringsAsFactors=FALSE)
+print(head(data))
 
 #read table with barcode, total number of reads, mapped reads, and unmapped reads (table_number_reads)
 total <- read.table(args[2],sep="\t",header=F,stringsAsFactors=FALSE)
+print(head(total))
 
 #read metadata file 
 metadata <- read.table(args[3],sep="\t",header=TRUE,stringsAsFactors=FALSE)
+print(head(metadata))
 
 #read coverage file (should be 8 columns, but the 5 ones are the important ones: barcode ref start end mean_coverage) - it only covers the barcode region
-coverage <- read.table(args[4],sep="\t",header=FALSE,stringsAsFactors=FALSE)
+#coverage <- read.table(args[4],sep="\t",header=FALSE,stringsAsFactors=FALSE)
 
 ##Make a table of proportion of reads per barcode/internal barcode 
 
