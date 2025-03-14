@@ -64,8 +64,7 @@ def cli():
 
 	output_file = convert_xlsx_to_txt(args.metadata)
 	kit_name = get_kit_name(args.metadata)
-	print(kit_name)
-
+	
 	sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
 	
 	if not args.skip_basecalling:
@@ -199,7 +198,7 @@ def cli():
 
 	#Run Rscript to create plots and tables 
 	print("...generating tables and plots...")
-	sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes total_reads {output_file} barcodes_coverage.bed', shell=True)
+	sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes total_reads {output_file}', shell=True)
 
 	###Remove temporary files 
 	#sp.run(r'rm list_bams list_demux_bams2 list_all_bams_final list_bams_final total_reads count_reads barcodes_variants count_reads_internal_barcodes.csv', shell=True)

@@ -40,7 +40,7 @@ merged <- left_join(max_y_vals,data_barcode_region,by="sample_id")
 
 combined_list$concentration <- as.factor(combined_list$concentration)
 
-ggplot(combined_list, aes(x=V2,y=V3,color=concentration)) + geom_line(size=0.2) + theme_classic() + facet_grid(sample_id~replicate, scales="free") +
+ggplot(combined_list, aes(x=V2,y=V3,color=concentration)) + geom_line(linewidth=0.2) + theme_classic() + facet_grid(sample_id~replicate, scales="free") +
 geom_rect(data=merged,inherit.aes=FALSE,aes(xmin=start,xmax=end,ymin=0,ymax=max_y),fill="orange",alpha=0.2) +
 xlab("gene position (bp)") + ylab("coverage")
 
