@@ -63,7 +63,7 @@ def cli():
 
 
 	output_file = convert_xlsx_to_txt(args.metadata)
-	kit_name = get_kit_name(args.metadata)
+	kit_name = get_kit_name(output_file)
 	
 	sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
 	
