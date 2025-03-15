@@ -3,7 +3,7 @@
 
 args = commandArgs(trailingOnly=TRUE)
 
-suppressWarnings(
+#suppressWarnings(
   metadata <- read.table(args[1],sep="\t",header=T,stringsAsFactors=F)
 
   ##add "barcode" or "barcode0" to the barcode column if not given 
@@ -26,4 +26,4 @@ suppressWarnings(
   metadata$barcode <- new_barcodes
 
   write.table(metadata,file=args[1],sep="\t",quote=F,row.names=F)
-)
+#)
