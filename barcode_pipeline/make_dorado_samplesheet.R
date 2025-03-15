@@ -17,30 +17,34 @@ args = commandArgs(trailingOnly=TRUE)
 ###time_point
 ###replicate 
 
-pkgs <- "dplyr"
-installed_packages <- pkgs %in% rownames(installed.packages())
-if(any(installed_packages==FALSE)){
-  install.packages(packages[!installed_packages])
-}
+library(dplyr, quietly=TRUE)
 
-library(dplyr)
-metadata <- read.table(args[1],sep="\t",header=T,stringsAsFactors=FALSE)
+suppressWarnings(
 
-#For DORADO sample sheet we need a csv file comma-separated with 
-##experiment_id
-##flow_cell_id
-##kit
-##barcode
-##alias
+  pkgs <- "dplyr"
+  installed_packages <- pkgs %in% rownames(installed.packages())
+  if(any(installed_packages==FALSE)){
+    install.packages(packages[!installed_packages])
+  }
 
-#Find those columns in metadata and create new data frame 
+  metadata <- read.table(args[1],sep="\t",header=T,stringsAsFactors=FALSE)
 
-columns_sample_sheet <- c("experiment_id","flow_cell_id","kit","barcode","alias")
+  #For DORADO sample sheet we need a csv file comma-separated with 
+  ##experiment_id
+  ##flow_cell_id
+  ##kit
+  ##barcode
+  ##alias
 
-#substract columns that match the columns_sample_sheet
-df <- metadata %>% dplyr::select(matches(columns_sample_sheet))
+  #Find those columns in metadata and create new data frame 
+
+  columns_sample_sheet <- c("experiment_id","flow_cell_id","kit","barcode","alias")
+
+  #substract columns that match the columns_sample_sheet
+  df <- metadata %>% dplyr::select(matches(columns_sample_sheet))
 
 
-write.table(df,file=paste(args[2],".csv",sep=""),sep=",",quote=FALSE,row.names=FALSE)
+  write.table(df,file=paste(args[2],".csv",sep=""),sep=",",quote=FALSE,row.names=FALSE)
 
+)
 
