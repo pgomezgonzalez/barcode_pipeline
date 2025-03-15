@@ -205,7 +205,7 @@ def cli():
 	#sp.run(r'rm list_bams list_demux_bams2 list_all_bams_final list_bams_final total_reads count_reads barcodes_variants count_reads_internal_barcodes.csv', shell=True)
 
 	###Rename files with prefix of the run to differentiate 
-	sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
+	#sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
 	sp.run(f'mv barplot_barcodes.png {args.prefix}.barplot_barcodes.png', shell=True)
 	sp.run(f'mv results.xlsx {args.prefix}.results.xlsx',shell=True)
 	sp.run(f'mv table_reads.txt {args.prefix}.table_reads.txt', shell=True) 
@@ -214,8 +214,8 @@ def cli():
 	sp.run(f'mv internal_barcodes {args.prefix}.internal_barcodes', shell=True)
 	sp.run(f'mv sample_sheet.csv {args.prefix}.sample_sheet.csv', shell=True)
 	sp.run(f'mv summary_proportions.txt {args.prefix}.summary_proportions.txt',shell=True)	
-	sp.run(f'mv coverage.bed {args.prefix}.coverage.bed',shell=True)
-	sp.run(f'mv rest_coverage.bed {args.prefix}.rest_coverage.bed', shell=True)
-	sp.run(f'mv coverage_plot.png {args.prefix}.coverage_plot.png', shell=True)
+	sp.run(f'mv mean_coverage.bed {args.prefix}.mean_coverage.bed',shell=True)
+	#sp.run(f'mv rest_coverage.bed {args.prefix}.rest_coverage.bed', shell=True)
+	sp.run(f'mv coverage_plots.png {args.prefix}.coverage_plots.png', shell=True)
 
 	print("ALL DONE!")
