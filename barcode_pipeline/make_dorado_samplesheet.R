@@ -19,7 +19,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 library(dplyr, quietly=TRUE)
 
-suppressWarnings(
+#suppressWarnings(
 
   pkgs <- "dplyr"
   installed_packages <- pkgs %in% rownames(installed.packages())
@@ -46,5 +46,5 @@ suppressWarnings(
 
   write.table(df,file=paste(args[2],".csv",sep=""),sep=",",quote=FALSE,row.names=FALSE)
 
-)
+#)
 

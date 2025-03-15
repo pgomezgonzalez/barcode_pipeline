@@ -17,7 +17,7 @@ library(dplyr, quietly=TRUE)
 library(openxlsx, quietly=TRUE)
 library(viridis, quietly=TRUE)
 
-suppressWarnings(
+#suppressWarnings(
   #read data of count reads (should be called count_reads_internal_barcodes and be tab delimited file with 3 or 4 columns (barcode,variant_id and read_count/read _count_missmatch))
 
   data <- read.table(args[1],sep="\t",header=F,stringsAsFactors=FALSE)
@@ -254,6 +254,6 @@ suppressWarnings(
 
   #ggsave("barplot_barcodes.png")
 
-)
+#)
 
 

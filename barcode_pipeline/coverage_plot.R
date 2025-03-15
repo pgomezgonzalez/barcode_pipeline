@@ -6,7 +6,7 @@ args = commandArgs(trailingOnly=TRUE)
 library(dplyr, quietly=TRUE)
 library(ggplot2, quietly=TRUE)
 
-suppressWarnings(
+#suppressWarnings(
 
     cov_files <- list.files(path="./coverage/",pattern="*.cov.bed",full.name=TRUE)
 
@@ -48,4 +48,4 @@ suppressWarnings(
 
     ggsave("coverage_plots.png")
 
-)
+#)
