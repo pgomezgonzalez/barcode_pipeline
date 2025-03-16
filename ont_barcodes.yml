@@ -1,5 +1,6 @@
 name: ont_barcodes
 channels:
+  - tsnyder
   - conda-forge
   - bioconda
   - defaults
@@ -11,11 +12,12 @@ dependencies:
   - bcftools=1.21=h3a4d415_1
   - bedtools=2.31.1=h13024bc_3
   - binutils_impl_linux-64=2.43=h4bf12b8_2
+  - biopython=1.85=py312h66e93f0_1
   - bwa=0.7.18=h577a1d6_2
   - bwidget=1.10.1=ha770c72_0
   - bzip2=1.0.8=h4bc722e_7
   - c-ares=1.34.4=hb9d3cd8_0
-  - ca-certificates=2024.12.31=h06a4308_0
+  - ca-certificates=2025.1.31=hbcca054_0
   - cairo=1.18.2=h3394656_1
   - curl=8.11.1=h332b0f4_0
   - font-ttf-dejavu-sans-mono=2.37=hab24e00_0
@@ -27,11 +29,15 @@ dependencies:
   - fonts-conda-forge=1=0
   - freetype=2.12.1=h267a509_2
   - fribidi=1.0.10=h36c2ea0_0
+  - gatk=3.8=hdfd78af_12
   - gcc_impl_linux-64=14.2.0=h6b349bd_1
+  - gettext=0.23.1=h5888daf_0
+  - gettext-tools=0.23.1=h5888daf_0
   - gfortran_impl_linux-64=14.2.0=hc73f493_1
   - giflib=5.2.2=hd590300_0
   - graphite2=1.3.14=h295c915_1
   - gsl=2.7.1=h6e86dc7_1
+  - gxf2bed=0.2.5=ha6fb395_0
   - gxx_impl_linux-64=14.2.0=h2c03514_1
   - harfbuzz=9.0.0=hda332d3_1
   - htslib=1.21=h566b1c6_1
@@ -43,7 +49,10 @@ dependencies:
   - lcms2=2.16=hb7c19ff_0
   - ld_impl_linux-64=2.43=h712a8e2_2
   - lerc=4.0.0=h27087fc_0
+  - libasprintf=0.23.1=h8e693c7_0
+  - libasprintf-devel=0.23.1=h8e693c7_0
   - libblas=3.9.0=26_linux64_openblas
+  - libcblas=3.9.0=26_linux64_openblas
   - libcups=2.3.3=h4637d8d_4
   - libcurl=8.11.1=h332b0f4_0
   - libdeflate=1.23=h4ddbbb0_0
@@ -54,6 +63,8 @@ dependencies:
   - libgcc=14.2.0=h77fa898_1
   - libgcc-devel_linux-64=14.2.0=h41c2201_101
   - libgcc-ng=14.2.0=h69a702a_1
+  - libgettextpo=0.23.1=h5888daf_0
+  - libgettextpo-devel=0.23.1=h5888daf_0
   - libgfortran=14.2.0=h69a702a_1
   - libgfortran-ng=14.2.0=h69a702a_1
   - libgfortran5=14.2.0=hd5240d6_1
@@ -86,14 +97,14 @@ dependencies:
   - make=4.4.1=hb9d3cd8_2
   - minimap2=2.28=h577a1d6_4
   - ncurses=6.5=h2d0b736_2
+  - numpy=2.2.3=py312h72c5963_0
   - openjdk=8.0.412=hd590300_1
-  - openssl=3.4.0=h7b32b05_1
+  - openssl=3.4.1=h7b32b05_0
   - pandoc=3.6.2=ha770c72_0
   - pango=1.54.0=h3a902e7_3
   - parallel=20241222=ha770c72_0
   - pcre2=10.44=hba22ea6_2
   - perl=5.38.2=0_h5eee18b_perl5
-  - pip=24.3.1=pyh8b19718_2
   - pixman=0.44.2=h29eaf8c_0
   - pthread-stubs=0.4=hb9d3cd8_1002
   - python=3.12.8=h9e4cc4f_1_cpython
@@ -105,6 +116,7 @@ dependencies:
   - r-base64enc=0.1_3=r44hb1dbf0f_1007
   - r-bit=4.5.0.1=r44h2b5f3a1_0
   - r-bit64=4.5.2=r44h2b5f3a1_0
+  - r-bitops=1.0_9=r44h2b5f3a1_0
   - r-blob=1.2.4=r44hc72bb7e_2
   - r-boot=1.3_31=r44hc72bb7e_0
   - r-broom=1.0.7=r44hc72bb7e_0
@@ -112,6 +124,7 @@ dependencies:
   - r-cachem=1.1.0=r44hb1dbf0f_1
   - r-callr=3.7.6=r44hc72bb7e_1
   - r-caret=6.0_94=r44hdb488b9_2
+  - r-catools=1.18.3=r44h93ab643_0
   - r-cellranger=1.1.0=r44hc72bb7e_1007
   - r-class=7.3_23=r44h2b5f3a1_0
   - r-cli=3.6.3=r44h0d4f4ea_1
@@ -157,7 +170,10 @@ dependencies:
   - r-googledrive=2.1.1=r44hc72bb7e_2
   - r-googlesheets4=1.1.1=r44h785f33e_2
   - r-gower=1.0.1=r44hb1dbf0f_2
+  - r-gplots=3.2.0=r44hc72bb7e_0
+  - r-gsalib=2.2.1=r44hc72bb7e_3
   - r-gtable=0.3.6=r44hc72bb7e_0
+  - r-gtools=3.9.5=r44hb1dbf0f_1
   - r-hardhat=1.4.0=r44hc72bb7e_1
   - r-haven=2.5.4=r44h0d4f4ea_1
   - r-hexbin=1.28.5=r44hb67ce94_0
@@ -201,7 +217,6 @@ dependencies:
   - r-nnet=7.3_20=r44h2b5f3a1_0
   - r-numderiv=2016.8_1.1=r44hc72bb7e_6
   - r-openssl=2.2.2=r44he8289e2_0
-  - r-openxlsx
   - r-parallelly=1.41.0=r44h2b5f3a1_0
   - r-pbdzmq=0.3_13=r44h549f438_0
   - r-pillar=1.10.1=r44hc72bb7e_0
@@ -235,6 +250,7 @@ dependencies:
   - r-rematch2=2.1.2=r44hc72bb7e_4
   - r-repr=1.1.7=r44h785f33e_1
   - r-reprex=2.1.1=r44hc72bb7e_1
+  - r-reshape=0.8.9=r44hc72bb7e_3
   - r-reshape2=1.4.4=r44h0d4f4ea_4
   - r-rlang=1.1.4=r44ha18555a_1
   - r-rmarkdown=2.29=r44hc72bb7e_0
@@ -281,11 +297,10 @@ dependencies:
   - readline=8.2=h8228510_1
   - samtools=1.21=h96c455f_1
   - sed=4.8=he412f7d_0
-  - setuptools=75.8.0=pyhff2d567_0
   - sysroot_linux-64=2.17=h0157908_18
   - tk=8.6.13=noxft_h4845f30_101
   - tktable=2.10=h8bc8fbc_6
-  - wheel=0.45.1=pyhd8ed1ab_1
+  - tre=0.8.0.1=h516909a_0
   - xorg-libice=1.1.2=hb9d3cd8_0
   - xorg-libsm=1.2.5=he73a12e_0
   - xorg-libx11=1.8.10=h4f16b4b_1
@@ -300,13 +315,17 @@ dependencies:
   - xorg-libxtst=1.2.5=hb9d3cd8_3
   - yaml=0.2.5=h7f98852_2
   - zeromq=4.3.5=h3b0a872_7
+  - zlib=1.3.1=hb9d3cd8_2
   - zstd=1.5.6=ha6fb4c9_0
   - pip:
-    - et-xmlfile==2.0.0
-    - numpy==2.2.2
-    - openpyxl==3.1.5
-    - pandas==2.2.3
-    - python-dateutil==2.9.0.post0
-    - pytz==2024.2
-    - six==1.17.0
-    - tzdata==2025.1
+      - devscripts==1.0.0
+      - et-xmlfile==2.0.0
+      - openpyxl==3.1.5
+      - pandas==2.2.3
+      - pip==24.3.1
+      - python-dateutil==2.9.0.post0
+      - pytz==2024.2
+      - setuptools==75.8.0
+      - six==1.17.0
+      - tzdata==2025.1
+      - wheel==0.45.1
