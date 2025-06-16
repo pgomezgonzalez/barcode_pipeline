@@ -137,14 +137,15 @@ def cli():
 	sp.run(f'dorado aligner {args.ref_fasta} ./fastqs/ --output-dir ./mapping --emit-summary', shell=True)
 
 	##Remove duplicate reads from the bam file 
-	sp.run(r'''cat list_bams | parallel -j 1 "samtools view ./mapping/{}.bam | cut -f1 | sort | uniq -c | awk '\$1!=1 {print \$2}' > ./mapping/{}.dupReads"''', shell=True)
-	sp.run(r'''cat list_bams | parallel -j 1 "samtools view -h ./mapping/{}.bam | grep -vf ./mapping/{}.dupReads | samtools view -bS -o ./mapping/{}.noDup.bam"''', shell=True)
+
+	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.bam ]]; then samtools view ./mapping/{}.bam | cut -f1 | sort | uniq -c | awk '\$1!=1 {print \$2}' > ./mapping/{}.dupReads; else echo "Skipping {}, {}.bam not found" >&2; fi"''', shell=True)
+	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.bam ]]; then samtools view -h ./mapping/{}.bam | grep -vf ./mapping/{}.dupReads | samtools view -bS -o ./mapping/{}.noDup.bam"''', shell=True)
 
 
 	##Calculate the number of total reads, mapped reads and unmapped reads 
-	sp.run(r'''cat list_bams | parallel -j 1 "samtools view ./mapping/{}.noDup.bam | wc -l >> total_reads"''', shell=True)
-	sp.run(r'''cat list_bams | parallel -j 1 "samtools view -F4 ./mapping/{}.noDup.bam | wc -l >> mapped_reads"''', shell=True)
-	sp.run(r'''cat list_bams | parallel -j 1 "samtools view -f4 ./mapping/{}.noDup.bam | wc -l >> unmapped_reads"''', shell=True)
+	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.noDup.bam ]]; then samtools view ./mapping/{}.noDup.bam | wc -l >> total_reads; else echo "0" >> total_reads; fi"''', shell=True)
+	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.noDup.bam ]]; then samtools view -F4 ./mapping/{}.noDup.bam | wc -l >> mapped_reads; else echo "0" >> mapped_reads; fi"''', shell=True)
+	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.noDup.bam ]]; then samtools view -f4 ./mapping/{}.noDup.bam | wc -l >> unmapped_reads; else echo "0" >> unmapped_reads; fi"''', shell=True)
 	sp.run(r'paste list_bams total_reads mapped_reads unmapped_reads > table_number_reads', shell=True)
 
 
@@ -161,12 +162,12 @@ def cli():
 
 	##create bam files excluding unmapped reads 
 	print("...creating mapped bam files...")
-	sp.run(r'''cat list_bams | parallel -j 1 "samtools view -F4 ./mapping/{}.noDup.bam -b -o ./mapping/{}.mapped.bam"''',shell=True)
+	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.noDup.bam ]]; then samtools view -F4 ./mapping/{}.noDup.bam -b -o ./mapping/{}.mapped.bam; fi"''',shell=True)
 	
 	print("...counting reads...")
 
-	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.mapped.bam | grep {2} | wc -l >> barcode_read_count"; done < list_bams''', shell=True)
-	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/$line.mapped.bam | grep {2} | awk '{print \$1}' >> $line.read_ids_with_barcode"; done < list_bams''', shell=True)
+	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/$line.mapped.bam ]]; then samtools view ./mapping/$line.mapped.bam | grep {2} | wc -l >> barcode_read_count; else echo "0" >>barcode_read_count; fi"; done < list_bams''', shell=True)
+	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/$line.mapped.bam ]]; then samtools view ./mapping/$line.mapped.bam | grep {2} | awk '{print \$1}' >> $line.read_ids_with_barcode; fi"; done < list_bams''', shell=True)
 	sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants"; done < list_bams''',shell=True)
 
 
