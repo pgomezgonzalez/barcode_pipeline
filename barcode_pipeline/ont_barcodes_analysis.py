@@ -139,13 +139,13 @@ def cli():
 	##Remove duplicate reads from the bam file 
 
 	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.bam ]]; then samtools view ./mapping/{}.bam | cut -f1 | sort | uniq -c | awk '\$1!=1 {print \$2}' > ./mapping/{}.dupReads; else echo "Skipping {}, {}.bam not found" >&2; fi"''', shell=True, executable='/bin/bash')
-	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.bam ]]; then samtools view -h ./mapping/{}.bam | grep -vf ./mapping/{}.dupReads | samtools view -bS -o ./mapping/{}.noDup.bam"''', shell=True)
+	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.bam ]]; then samtools view -h ./mapping/{}.bam | grep -vf ./mapping/{}.dupReads | samtools view -bS -o ./mapping/{}.noDup.bam; fi"''', shell=True, executable='/bin/bash')
 
 
 	##Calculate the number of total reads, mapped reads and unmapped reads 
-	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.noDup.bam ]]; then samtools view ./mapping/{}.noDup.bam | wc -l >> total_reads; else echo "0" >> total_reads; fi"''', shell=True)
-	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.noDup.bam ]]; then samtools view -F4 ./mapping/{}.noDup.bam | wc -l >> mapped_reads; else echo "0" >> mapped_reads; fi"''', shell=True)
-	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.noDup.bam ]]; then samtools view -f4 ./mapping/{}.noDup.bam | wc -l >> unmapped_reads; else echo "0" >> unmapped_reads; fi"''', shell=True)
+	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.noDup.bam ]]; then samtools view ./mapping/{}.noDup.bam | wc -l >> total_reads; else echo "0" >> total_reads; fi"''', shell=True, executable='/bin/bash')
+	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.noDup.bam ]]; then samtools view -F4 ./mapping/{}.noDup.bam | wc -l >> mapped_reads; else echo "0" >> mapped_reads; fi"''', shell=True, executable='/bin/bash')
+	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.noDup.bam ]]; then samtools view -f4 ./mapping/{}.noDup.bam | wc -l >> unmapped_reads; else echo "0" >> unmapped_reads; fi"''', shell=True, executable='/bin/bash')
 	sp.run(r'paste list_bams total_reads mapped_reads unmapped_reads > table_number_reads', shell=True)
 
 
@@ -162,21 +162,21 @@ def cli():
 
 	##create bam files excluding unmapped reads 
 	print("...creating mapped bam files...")
-	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.noDup.bam ]]; then samtools view -F4 ./mapping/{}.noDup.bam -b -o ./mapping/{}.mapped.bam; fi"''',shell=True)
+	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.noDup.bam ]]; then samtools view -F4 ./mapping/{}.noDup.bam -b -o ./mapping/{}.mapped.bam; fi"''',shell=True, executable='/bin/bash')
 	
 	print("...counting reads...")
 
-	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/$line.mapped.bam ]]; then samtools view ./mapping/$line.mapped.bam | grep {2} | wc -l >> barcode_read_count; else echo "0" >>barcode_read_count; fi"; done < list_bams''', shell=True)
-	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/$line.mapped.bam ]]; then samtools view ./mapping/$line.mapped.bam | grep {2} | awk '{print \$1}' >> $line.read_ids_with_barcode; fi"; done < list_bams''', shell=True)
+	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/$line.mapped.bam ]]; then samtools view ./mapping/$line.mapped.bam | grep {2} | wc -l >> barcode_read_count; else echo "0" >>barcode_read_count; fi"; done < list_bams''', shell=True, executable='/bin/bash')
+	sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/$line.mapped.bam ]]; then samtools view ./mapping/$line.mapped.bam | grep {2} | awk '{print \$1}' >> $line.read_ids_with_barcode; fi"; done < list_bams''', shell=True, executable='/bin/bash')
 	sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants"; done < list_bams''',shell=True)
 
 
 	if args.allow_mismatch:
 		#remove the reads that have picked up an internal barcode with exact match from bam file (into a different bam file called barcodeXX_rest.bam)
-		sp.run(r'cat list_bams | parallel -j 1 "samtools view -h ./mapping/{}.mapped.bam | grep -vf {}.read_ids_with_barcode | samtools view -bS -o ./mapping/{}_rest.bam"', shell=True)
+		sp.run(r'cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.mapped.bam ]]; then samtools view -h ./mapping/{}.mapped.bam | grep -vf {}.read_ids_with_barcode | samtools view -bS -o ./mapping/{}_rest.bam; fi"', shell=True, executable='/bin/bash')
 		#count reads allowing for a mismatch 
 
-		sp.run(f'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "samtools view ./mapping/${{line}}_rest.bam | agrep -n{args.mismatch} {{2}} - | wc -l >> count_reads_mismatch"; done < list_bams''',shell=True)
+		sp.run(f'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/${{line}}_rest.bam ]]; then samtools view ./mapping/${{line}}_rest.bam | agrep -n{args.mismatch} {{2}} - | wc -l >> count_reads_mismatch; else echo "0" >> count_reads_mismatch; fi"; done < list_bams''',shell=True, executable='/bin/bash')
 				
 		sp.run(r'paste barcodes_variants barcode_read_count count_reads_mismatch > count_reads_internal_barcodes',shell=True)
 
@@ -188,11 +188,11 @@ def cli():
 	#############################################################################-----CALCULATE COVERAGE-----###############################################################################
 	#calculate coverage
 	print("***____calculating coverage____***")
-	sp.run(f'''cat list_bams | parallel -j 1 "bedtools coverage -a {args.region_bed} -b ./mapping/{{}}.mapped.bam >> coverage.bed"''',shell=True)
+	sp.run(f'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{{}}.mapped.bam ]]; then bedtools coverage -a {args.region_bed} -b ./mapping/{{}}.mapped.bam >> coverage.bed; else echo "NA" >> coverage.bed; fi"''',shell=True, executable='/bin/bash')
 	sp.run(r'paste list_bams coverage.bed > mean_coverage.bed', shell=True)
 	#Calculate coverage at each position and make plots 
 	sp.run(r'mkdir coverage', shell=True)
-	sp.run(r'''cat list_bams | parallel -j 1 --col-sep "\t" "bedtools genomecov -d -ibam ./mapping/{}.mapped.bam > ./coverage/{}.cov.bed"''', shell=True)
+	sp.run(r'''cat list_bams | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/{}.mapped.bam ]]; then bedtools genomecov -d -ibam ./mapping/{}.mapped.bam > ./coverage/{}.cov.bed; fi"''', shell=True, executable='/bin/bash')
 	sp.run(f'Rscript {script_path}/coverage_plot.R {output_file} {args.region_bed}', shell=True) ##creates coverage line plots for the amplicon region 
 
 
