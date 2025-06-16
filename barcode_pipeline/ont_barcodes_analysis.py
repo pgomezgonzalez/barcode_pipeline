@@ -138,8 +138,8 @@ def cli():
 
 	##Remove duplicate reads from the bam file 
 
-	sp.run(r'''cat list_bams | parallel -j 1 "if \[[ -f ./mapping/{}.bam ]]; then samtools view ./mapping/{}.bam | cut -f1 | sort | uniq -c | awk '\$1!=1 {print \$2}' > ./mapping/{}.dupReads; else echo "Skipping {}, {}.bam not found" >&2; fi"''', shell=True, executable='/bin/bash')
-	sp.run(r'''cat list_bams | parallel -j 1 "if \[[ -f ./mapping/{}.bam ]]; then samtools view -h ./mapping/{}.bam | grep -vf ./mapping/{}.dupReads | samtools view -bS -o ./mapping/{}.noDup.bam"''', shell=True)
+	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.bam ]]; then samtools view ./mapping/{}.bam | cut -f1 | sort | uniq -c | awk '\$1!=1 {print \$2}' > ./mapping/{}.dupReads; else echo "Skipping {}, {}.bam not found" >&2; fi"''', shell=True, executable='/bin/bash')
+	sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.bam ]]; then samtools view -h ./mapping/{}.bam | grep -vf ./mapping/{}.dupReads | samtools view -bS -o ./mapping/{}.noDup.bam"''', shell=True)
 
 
 	##Calculate the number of total reads, mapped reads and unmapped reads 
