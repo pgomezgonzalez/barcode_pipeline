@@ -43,6 +43,16 @@ library(dplyr, quietly=TRUE)
   #substract columns that match the columns_sample_sheet
   df <- metadata %>% dplyr::select(matches(columns_sample_sheet))
 
+  ##Check if alias is the same as barcode, if so, change alias by adding the capital "B" in barcode 
+  capitalize <- function(x){
+    paste0(toupper(substr(x,1,1)),substr(x,2,nchar(x)))
+  }
+
+  for(i in 1:nrow(df)){
+    if(df$barcode[i]==df$alias[i]){
+      df$alias[i] <- capitalize(df$barcode[i])
+    }
+  }
 
   write.table(df,file=paste(args[2],".csv",sep=""),sep=",",quote=FALSE,row.names=FALSE)
 
