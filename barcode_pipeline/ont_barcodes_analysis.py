@@ -30,7 +30,7 @@ def cli():
 	argparser.add_argument("--only-basecalling",action="store_true", help="Only perform basecalling")
 	argparser.add_argument("--allow-mismatch", action="store_true", help="on reads where no exact match for internal barcodes has been found, allow for a mismatch")
 	argparser.add_argument("--mismatch",type=int, help="number of mismatches allowed",default=1)
-	argparser.add_argument("--nBarcodes",choices=["simple","dual"],required=True,help="Rounds of barcodes used to multiplex: simple if 1 native barcode, dual if PCR barcodes + native barcodes",required=True)
+	argparser.add_argument("--nBarcodes",choices=["simple","dual"],required=True,help="Rounds of barcodes used to multiplex: simple if 1 native barcode, dual if PCR barcodes + native barcodes")
 	argparser.add_argument("--dualBarcodeData",help="metadata with Native barcodes used and correspondent metadata file (experiment_id, flow_cell_id, kit, barcode, alias, metadata_file_name)")
 
 	args = argparser.parse_args()
