@@ -60,7 +60,7 @@ def cli():
 
 	def get_kit_name(metadata_file):
 		df = pd.read_csv(metadata_file, sep='\t')
-		kit_name = df.loc[1,"kit_name"]
+		kit_name = df.loc[1,"kit"]
 		return kit_name
 
 
