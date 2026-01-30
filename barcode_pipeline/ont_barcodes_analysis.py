@@ -315,12 +315,12 @@ def cli():
 		for output_file in output_files:
 			sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
 
-		barcode_map = {}
-		with open(args.dualBarcodeData) as f:
-			for line in f:
-				#barcode, filename = line.strip().split()
-				barcode, filename = line.rstrip("\n").split("\t")[:2]
-				barcode_map[filename] = barcode
+		
+		df = pd.read_csv(arg.dualBarcodeData,sep="\t")
+		barcode_map = {
+			Path(row["filename"]).name: row["barcode"]
+			for _, row in df.iterrows()
+		}
 
 		for output_file in output_files:
 				filename = output_file
