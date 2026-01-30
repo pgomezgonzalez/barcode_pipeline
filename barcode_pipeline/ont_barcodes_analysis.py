@@ -294,13 +294,14 @@ def cli():
 		bam_dir = Path("demux_NB")
 
 		for bam in bam_dir.rglob("*.bam"):
-    		for alias, barcode in barcode_alias.items():
-        		if alias in bam.name:
-          			new_name = f"NB_{barcode}.bam"
-            		new_path = bam.with_name(new_name)
-            		print(f"Renaming {bam} → {new_path}")
-            		bam.rename(new_path)
-            		break
+			for alias, barcode in barcode_alias.items():
+				if alias in bam.name:
+					new_name = f"NB_{barcode}.bam"
+					new_path = bam.with_name(new_name)
+					print(f"Renaming {bam} to {new_path}")
+					bam.rename(new_path)
+					break
+
 
 		############################################################################################################################################################
 		###################################################################---ROUND #2 DEMUX---#####################################################################
