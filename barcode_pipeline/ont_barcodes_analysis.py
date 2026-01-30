@@ -316,7 +316,7 @@ def cli():
 			sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
 
 		
-		df = pd.read_csv(arg.dualBarcodeData,sep="\t")
+		df = pd.read_csv(args.dualBarcodeData,sep="\t")
 		barcode_map = {
 			Path(row["filename"]).name: row["barcode"]
 			for _, row in df.iterrows()
