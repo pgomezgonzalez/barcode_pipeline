@@ -276,7 +276,7 @@ def cli():
 
 		print("...demultiplexing ROUND 1...")
 
-		sp.run(f'dorado demux --output-dir demux_NB --kit-name {kit_name} --sample-sheet sample_sheet --emit-summary {args.output}.bam', shell=True)
+		sp.run(f'dorado demux --output-dir demux_NB --kit-name {kit_name} --sample-sheet sample_sheet.csv --emit-summary {args.output}.bam', shell=True)
 
 		##This is going to demultiplex into barcode_bam files, but the name of the barcode is going to be the alias name.
 		##For easier handling, rename the bam files to NB_barcodeXX.bam 
