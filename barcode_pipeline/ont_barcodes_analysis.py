@@ -282,14 +282,12 @@ def cli():
 		##This is going to demultiplex into barcode_bam files, but the name of the barcode is going to be the alias name.
 		##For easier handling, rename the bam files to NB_barcodeXX.bam 
 
-		barcode_alias = {}
-		with open(args.dualBarcodeData) as f:
-			next(f)
-			for line in f:
-				fields = line.rstrip("\n").split("\t")
-				barcode = fields[2]
-				alias = fields[4]
-				barcode_alias[alias] = barcode
+		sample_sheet = Path("sample_sheet.csv")
+		df = pd.read_csv(sample_sheet)
+
+		barcode_alias = dict(
+			zip(df["alias"], df["barcode"])
+		)
 		
 		bam_dir = Path("demux_NB")
 
