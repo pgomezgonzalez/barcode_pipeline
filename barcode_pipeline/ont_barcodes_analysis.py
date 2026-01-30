@@ -284,7 +284,8 @@ def cli():
 		barcode_alias = {}
 		with open(args.dualBarcodeData) as f:
 			for line in f:
-				barcode, alias = line.strip().split()
+				#barcode, alias = line.strip().split()
+				barcode, alias = line.rstrip("\n").split("\t")[:2]
 				barcode_alias[alias] = barcode 
 		
 		bam_dir = Path("demux_NB")
