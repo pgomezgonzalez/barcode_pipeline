@@ -318,7 +318,8 @@ def cli():
 		barcode_map = {}
 		with open(args.dualBarcodeData) as f:
 			for line in f:
-				barcode, filename = line.strip().split()
+				#barcode, filename = line.strip().split()
+				barcode, filename = line.rstrip("\n").split("\t")[:2]
 				barcode_map[filename] = barcode
 
 		for output_file in output_files:
@@ -358,7 +359,8 @@ def cli():
 			barcode_alias = {}
 			with open(sample_sheet) as f:
 				for line in f:
-					barcode_value, alias = line.strip().split()
+					#barcode_value, alias = line.strip().split()
+					barcode, alias = line.rstrip("\n").split("\t")[:2]
 					barcode_alias[alias] = barcode_value 
 		
 			for alias, barcode_value in barcode_alias.items():
