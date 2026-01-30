@@ -289,7 +289,7 @@ def cli():
 				#barcode, alias = line.strip().split()
 				fields = line.rstrip("\n").split("\t")
         		barcode = fields[2]
-        		alias = fields[4]				
+        		alias = fields[4]
 				barcode_alias[alias] = barcode 
 		
 		bam_dir = Path("demux_NB")
