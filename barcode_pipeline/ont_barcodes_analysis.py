@@ -325,7 +325,7 @@ def cli():
 		for output_file in output_files:
 				filename = Path(output_file).name
 				barcode = barcode_map[filename]
-				sp.run(f'Rscript {script_path}/make_dorado_samplesheet.R {output_file} {barcode}.csv', shell=True)  
+				sp.run(f'Rscript {script_path}/make_dorado_samplesheet.R {output_file} {barcode}', shell=True)  
 				## In this case, the metadata files for each NB barcodes are called by the barcodeXX name 
 
 		##create one folder per NB barcode 
