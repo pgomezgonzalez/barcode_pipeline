@@ -284,19 +284,24 @@ def cli():
 
 		barcode_alias = {}
 		with open(args.dualBarcodeData) as f:
+			next(f)
 			for line in f:
 				#barcode, alias = line.strip().split()
-				barcode, alias = line.rstrip("\n").split("\t")[:2]
+				fields = line.rstrip("\n").split("\t")
+        		barcode = fields[2]
+        		alias = fields[4]				
 				barcode_alias[alias] = barcode 
 		
 		bam_dir = Path("demux_NB")
 
-		for alias, barcode in barcode_alias.items():
-			for bam in bam_dir.rglob("*.bam"):
-				if alias in bam.name:
-					new_name = f"NB_{barcode}.bam"
-					new_path = bam.with_name(new_name)
-					bam.rename(new_path)
+		for bam in bam_dir.rglob("*.bam"):
+    		for alias, barcode in barcode_alias.items():
+        		if alias in bam.name:
+          			new_name = f"NB_{barcode}.bam"
+            		new_path = bam.with_name(new_name)
+            		print(f"Renaming {bam} → {new_path}")
+            		bam.rename(new_path)
+            		break
 
 		############################################################################################################################################################
 		###################################################################---ROUND #2 DEMUX---#####################################################################
@@ -377,7 +382,7 @@ def cli():
 
 		###Trim the adapters and primers (for dual barcoding, this has not been done during basecalling)
 		kit_name = get_kit_name(NB_meta)
-		
+
 		for bam in Path("demux_NB").rglob("*.bam"):
 			if bam.name.endswith(".trimmed.bam"):
 				continue
