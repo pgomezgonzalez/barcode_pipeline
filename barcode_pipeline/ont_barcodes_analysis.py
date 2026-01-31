@@ -411,7 +411,7 @@ def cli():
 			sp.run(f"""ls ./demux_NB/{barcode}/*barcode*.trimmed.bam | sed 's/.*\\(barcode[0-9]*\\)\\.trimmed.bam/\\1/' > list_bams_{barcode}""", shell=True)
 			sp.run(f'ls ./demux_NB/{barcode}/*barcode*.trimmed.bam > list_demux_bams2_{barcode}',shell=True)
 			sp.run(f'paste list_demux_bams2_{barcode} list_bams_{barcode} > list_bams_final_{barcode}',shell=True)
-			sp.run(f'''cat list_bams_final_{barcode} | parallel -j 1 --col-sep "\t" "samtools view -b -e '[qs]>=8' {1} | samtools fastq - | pigz -c > ./fastqs/{barcode}/{2}.fastq.gz"''',shell=True)
+			sp.run(f'''cat list_bams_final_{barcode} | parallel -j 1 --col-sep "\t" "samtools view -b -e '[qs]>=8' {{1}} | samtools fastq - | pigz -c > ./fastqs/{barcode}/{{2}}.fastq.gz"''',shell=True)
 	
 		############################################################################################################################################################
 		############################################################################################################################################################
