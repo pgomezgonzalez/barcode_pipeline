@@ -17,7 +17,9 @@ args = commandArgs(trailingOnly=TRUE)
 ###time_point
 ###replicate 
 
-library(dplyr, quietly=TRUE)
+suppressPackageStartupMessages({
+  library(dplyr, quitely=TRUE)
+})
 
 #suppressWarnings(
 

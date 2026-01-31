@@ -353,7 +353,7 @@ def cli():
 				continue
 
 			barcode = barcode_dir.name
-			sample_sheet = demux_root / f"{barcode}.csv"
+			sample_sheet = f"{barcode}.csv"
 
 			if not sample_sheet.exists():
 				print(f"Skipping {barcode}: no sample sheet {sample_sheet.name}")
