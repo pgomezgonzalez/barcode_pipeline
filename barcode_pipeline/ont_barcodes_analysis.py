@@ -353,26 +353,28 @@ def cli():
 				continue
 
 			barcode = barcode_dir.name
-			sample_sheet = demux_root/f"{barcode}.csv"
+			sample_sheet = demux_root / f"{barcode}.csv"
 
 			if not sample_sheet.exists():
 				print(f"Skipping {barcode}: no sample sheet {sample_sheet.name}")
 				continue
 			
-			barcode_alias = {}
-			with open(sample_sheet) as f:
-				for line in f:
-					#barcode_value, alias = line.strip().split()
-					barcode, alias = line.rstrip("\n").split("\t")[:2]
-					barcode_alias[alias] = barcode_value 
-		
-			for alias, barcode_value in barcode_alias.items():
-				for bam in barcode_dir.glob("*.bam"):
+			print(f"****processing {barcode_dir.name}****")
+
+			df = pd.read_csv(sample_sheet)
+
+			barcode_alias = dict(zip(df["alias"], df["barcode"]))
+
+			for bam in barcode_dir.glob("*.bam"):
+				for alias, barcode_value in barcode_alias.items():
 					if alias in bam.name:
-						new_name = f"PCR_{barcode_value}.bam"
+						new_name = f"{barcode_value}.bam"
 						new_path = bam.with_name(new_name)
+
+					if bam.name != new_name:
 						bam.rename(new_path)
-		
+
+					break
 
 		############################################################################################################################################################
 		############################################################################################################################################################
