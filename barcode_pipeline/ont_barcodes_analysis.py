@@ -353,7 +353,7 @@ def cli():
 				continue
 
 			barcode = barcode_dir.name
-			sample_sheet = f"{barcode}.csv"
+			sample_sheet = Path(f"{barcode}.csv")
 
 			if not sample_sheet.exists():
 				print(f"Skipping {barcode}: no sample sheet {sample_sheet.name}")
@@ -372,6 +372,7 @@ def cli():
 						new_path = bam.with_name(new_name)
 
 					if bam.name != new_name:
+						print(f"Renaming {bam} to {new_path}")
 						bam.rename(new_path)
 
 					break
@@ -408,8 +409,8 @@ def cli():
 				continue
 			(fastqs_root / barcode).mkdir(parents=True,exist_ok=True)
 			print(f"...creating fastqs/{barcode}...")
-			sp.run(f"""ls ./demux_NB/{barcode}/*barcode*.bam | sed 's/.*\\(barcode[0-9]*\\)\\.bam/\\1/' > list_bams_{barcode}""", shell=True)
-			sp.run(f'ls ./demux_NB/{barcode}/*barcode*.bam > list_demux_bams2_{barcode}',shell=True)
+			sp.run(f"""ls ./demux_NB/{barcode}/*barcode*.trimmed.bam | sed 's/.*\\(barcode[0-9]*\\)\\.trimmed.bam/\\1/' > list_bams_{barcode}""", shell=True)
+			sp.run(f'ls ./demux_NB/{barcode}/*barcode*.trimmed.bam > list_demux_bams2_{barcode}',shell=True)
 			sp.run(f'paste list_demux_bams2_{barcode} list_bams_{barcode} > list_bams_final_{barcode}',shell=True)
 			sp.run(f'''cat list_bams_final_{barcode} | parallel -j 1 --col-sep "\t" "samtools view -b -e '[qs]>=8' {1} | samtools fastq - | pigz -c > ./fastqs/{barcode}/{2}.fastq.gz"''',shell=True)
 	
