@@ -367,7 +367,7 @@ def cli():
 			for bam in bam_dir.rglob("*.bam"):
 				for alias, barcode in barcode_alias.items():
 					if alias in bam.name:
-						new_name = f"NB_{barcode}.bam"
+						new_name = f"{barcode}.bam"
 						new_path = bam.with_name(new_name)
 						print(f"Renaming {bam} to {new_path}")
 						bam.rename(new_path)
@@ -380,14 +380,17 @@ def cli():
 		###Trim the adapters and primers (for dual barcoding, this has not been done during basecalling)
 		kit_name = get_kit_name(NB_meta)
 
-		for bam in Path("demux_NB").rglob("*.bam"):
-			if bam.name.endswith(".trimmed.bam"):
-				continue
-			trimmed = bam.with_suffix(".trimmed.bam")
+		for barcode_dir in demux_root.iterdir():
+			if not barcode_dir.is_dir():
+				continue 
+			for bam in barcode_dir.rglob("*.bam"):
+				if bam.name.endswith(".trimmed.bam"):
+					continue
+				trimmed = bam.with_suffix(".trimmed.bam")
 
-			sp.run(f'dorado trim {bam} --sequencing-kit {kit_name} > {trimmed}',shell=True,check=True)
+				sp.run(f'dorado trim {bam} --sequencing-kit {kit_name} > {trimmed}',shell=True,check=True)
 
-		##trimmed bams should be called PCR_barcodeXX.trimmed.bam 
+		##trimmed bams should be called barcodeXX.trimmed.bam 
 
 		############################################################################################################################################################
 		############################################################################################################################################################
