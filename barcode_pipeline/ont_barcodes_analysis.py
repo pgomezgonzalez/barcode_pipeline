@@ -347,34 +347,30 @@ def cli():
 		##same as before, bam files will be called by the alias instead of the barcode, change back to the barcode name 
 
 		demux_root = Path("demux_NB")
+		sample_sheet_dir = demux_root.parent
 
 		for barcode_dir in demux_root.iterdir():
 			if not barcode_dir.is_dir():
 				continue
-
 			barcode = barcode_dir.name
-			sample_sheet = Path(f"{barcode}.csv")
+			sample_sheet = sample_sheet_dir / f"{barcode}.csv"
+			print(f"reading {barcode_dir} sample_sheet")
 
 			if not sample_sheet.exists():
 				print(f"Skipping {barcode}: no sample sheet {sample_sheet.name}")
 				continue
 			
-			print(f"****processing {barcode_dir.name}****")
-
 			df = pd.read_csv(sample_sheet)
-
 			barcode_alias = dict(zip(df["alias"], df["barcode"]))
+			bam_dir = barcode_dir 
 
-			for bam in barcode_dir.glob("*.bam"):
-				for alias, barcode_value in barcode_alias.items():
-					if alias in bam.name:
-						new_name = f"{barcode_value}.bam"
-						new_path = bam.with_name(new_name)
-
-					if bam.name != new_name:
-						print(f"Renaming {bam} to {new_path}")
-						bam.rename(new_path)
-
+			for bam in bam_dir.rglob("*.bam"):
+				for alias, barcode in barcode_alias.items():
+				if alias in bam.name:
+					new_name = f"NB_{barcode}.bam"
+					new_path = bam.with_name(new_name)
+					print(f"Renaming {bam} to {new_path}")
+					bam.rename(new_path)
 					break
 
 		############################################################################################################################################################
