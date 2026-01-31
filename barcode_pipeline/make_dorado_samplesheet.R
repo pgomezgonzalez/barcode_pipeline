@@ -18,7 +18,7 @@ args = commandArgs(trailingOnly=TRUE)
 ###replicate 
 
 suppressPackageStartupMessages({
-  library(dplyr, quitely=TRUE)
+  library(dplyr)
 })
 
 #suppressWarnings(
