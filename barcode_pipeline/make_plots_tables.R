@@ -215,8 +215,14 @@ suppressPackageStartupMessages({
   #list_results <- list("reads" = df, "proportions" = df2, "percentages" = df3, "percentages_long" = df3_melt, "summary" = summary_df3.2)
   list_results <- list("reads" = df, "proportions" = df2, "percentages" = df3)
 
-  write.xlsx(list_results,file="results.xlsx")
-
+  name_run <- args[1]
+  name_run <- strsplit(name_run,"_")[[1]]
+  if(length(name_run)==5){
+    barcode_name <- name_run[5]
+    write.xlsx(list_results,file=paste("results_",barcode_name,".xlsx",sep=""))
+  }else{
+    write.xlsx(list_results,file="results.xlsx")
+  }
 
   ##Make a line plot 
   #The time point 0 is only for the controls with concentration 0, then time point 1 is for controls 
