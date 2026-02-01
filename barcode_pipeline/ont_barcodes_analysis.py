@@ -458,7 +458,7 @@ def cli():
 			src = Path(internal_barcodes_txt)
 			dst = Path("internal_barcodes")
 			if src.name != dst.name:
-				shutil.copyfile(src, dst)
+				shutil.copyfile(src, "internal_barcodes")
 
 			##create bam files excluding unmapped reads 
 			print("...creating mapped bam files...")
@@ -466,19 +466,19 @@ def cli():
 	
 			print("...counting reads...")
 
-			sp.run(rf'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/{barcode}/$line.mapped.bam ]]; then samtools view {out_dir}/{barcode}/$line.mapped.bam | grep {2} | wc -l >> barcode_read_count_{barcode}; else echo "0" >> barcode_read_count_{barcode}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
-			sp.run(rf'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/{barcode}/$line.mapped.bam ]]; then samtools view {out_dir}/{barcode}/$line.mapped.bam | grep {2} | awk '{{print \$1}}' >> $line.read_ids_with_barcode_{barcpde}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
+			sp.run(rf'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/$line.mapped.bam ]]; then samtools view {out_dir}/$line.mapped.bam | grep {{2}} | wc -l >> barcode_read_count_{barcode}; else echo "0" >> barcode_read_count_{barcode}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
+			sp.run(rf'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/$line.mapped.bam ]]; then samtools view {out_dir}/$line.mapped.bam | grep {{2}} | awk '{{print \$1}}' >> $line.read_ids_with_barcode_{barcode}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
 			sp.run(rf'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants_{barcode}"; done < list_bams_{barcode}''',shell=True)
 
 
 			if args.allow_mismatch:
 				#remove the reads that have picked up an internal barcode with exact match from bam file (into a different bam file called barcodeXX_rest.bam)
-				sp.run(r'cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.mapped.bam ]]; then samtools view -h ./mapping/{}.mapped.bam | grep -vf {}.read_ids_with_barcode | samtools view -bS -o ./mapping/{}_rest.bam; fi"', shell=True, executable='/bin/bash')
+				sp.run(rf'cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.mapped.bam ]]; then samtools view -h {out_dir}/{{}}.mapped.bam | grep -vf {{}}.read_ids_with_barcode | samtools view -bS -o {out_dir}/{{}}_rest.bam; fi"', shell=True, executable='/bin/bash')
 				#count reads allowing for a mismatch 
 
-				sp.run(f'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/${{line}}_rest.bam ]]; then samtools view ./mapping/${{line}}_rest.bam | agrep -n{args.mismatch} {{2}} - | wc -l >> count_reads_mismatch; else echo "0" >> count_reads_mismatch; fi"; done < list_bams''',shell=True, executable='/bin/bash')
+				sp.run(rf'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/${{line}}_rest.bam ]]; then samtools view {out_dir}/${{line}}_rest.bam | agrep -n{args.mismatch} {{2}} - | wc -l >> count_reads_mismatch_{barcode}; else echo "0" >> count_reads_mismatch_{barcode}; fi"; done < list_bams_{barcode}''',shell=True, executable='/bin/bash')
 				
-				sp.run(r'paste barcodes_variants barcode_read_count count_reads_mismatch > count_reads_internal_barcodes',shell=True)
+				sp.run(rf'paste barcodes_variants_{barcode} barcode_read_count_{barcode} count_reads_mismatch_{barcode} > count_reads_internal_barcodes_{barcode}',shell=True)
 
 			else:
 				sp.run(rf'paste barcodes_variants_{barcode} barcode_read_count_{barcode} > count_reads_internal_barcodes_{barcode}',shell=True)
