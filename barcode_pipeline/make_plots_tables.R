@@ -62,14 +62,14 @@ suppressPackageStartupMessages({
     df$unmapped_reads[i] <- total$V4[idx]
   }
 
-  df$time_point <- "" 
-  df$replicate <- "" 
+  #df$time_point <- "" 
+  #df$replicate <- "" 
 
-  for(i in 1:nrow(df)){
-	  idx <- which(metadata$barcode==df$NP_barcode[i])
-	  df$time_point[i] <- metadata[idx,"time_point"]
-	  df$replicate[i] <- metadata[idx,"replicate"]
-  }
+  #for(i in 1:nrow(df)){
+	#  idx <- which(metadata$barcode==df$NP_barcode[i])
+	#  df$time_point[i] <- metadata[idx,"time_point"]
+	#  df$replicate[i] <- metadata[idx,"replicate"]
+  #}
 
 
 
@@ -87,131 +87,130 @@ suppressPackageStartupMessages({
   df2 <- as.data.frame(mat2)
   df2$NP_barcode <- NP_barcodes
   df2$sample_id <- df$sample_id
-  df2$concentration <- df$concentration
+  #df2$concentration <- df$concentration
   df2$total_reads_barcodes <- df$total_reads_barcodes
   df2$total_reads <- df$total_reads
-  df2$time_point <- "" 
-  df2$replicate <- "" 
+  #df2$time_point <- "" 
+  #df2$replicate <- "" 
 
-  for(i in 1:nrow(df2)){
-	  idx <- which(metadata$barcode==df2$NP_barcode[i])
-	  df2$time_point[i] <- metadata[idx,"time_point"]
-	  df2$replicate[i] <- metadata[idx,"replicate"]
-
-  }
+  #for(i in 1:nrow(df2)){
+	#  idx <- which(metadata$barcode==df2$NP_barcode[i])
+	#  df2$time_point[i] <- metadata[idx,"time_point"]
+	#  df2$replicate[i] <- metadata[idx,"replicate"]
+  #}
 
   write.table(df2,file="table_proportions.txt",sep="\t",quote=F,row.names=F)
 
   df3 <- as.data.frame(mat3)
   df3$NP_barcode <- NP_barcodes
   df3$sample_id <- df$sample_id
-  df3$concentration <- df$concentration
+  #df3$concentration <- df$concentration
   df3$total_reads_barcodes <- df$total_reads_barcodes
   df3$total_reads <- df$total_reads
-  df3$time_point <- "" 
-  df3$replicate <- "" 
+  #df3$time_point <- "" 
+  #df3$replicate <- "" 
 
-  for(i in 1:nrow(df3)){
-	  idx <- which(metadata$barcode==df3$NP_barcode[i])
-	  df3$time_point[i] <- metadata[idx,"time_point"]
-	  df3$replicate[i] <- metadata[idx,"replicate"]
-
-  }
+  #for(i in 1:nrow(df3)){
+	#  idx <- which(metadata$barcode==df3$NP_barcode[i])
+	#  df3$time_point[i] <- metadata[idx,"time_point"]
+	#  df3$replicate[i] <- metadata[idx,"replicate"]
+  #}
 
   write.table(df3,file="table_percentages.txt",sep="\t",quote=F,row.names=F)
 
   #generate averages by timepoint and by antibody used using the replicates
 
-  df3$time_point <- "" 
-  df3$replicate <- "" 
+  #df3$time_point <- "" 
+  #df3$replicate <- "" 
 
-  for(i in 1:nrow(df3)){
-	  idx <- which(metadata$barcode==df$NP_barcode[i])
-	  df3$time_point[i] <- metadata[idx,"time_point"]
-	  df3$replicate[i] <- metadata[idx,"replicate"]
-
-  }
+  #for(i in 1:nrow(df3)){
+	#  idx <- which(metadata$barcode==df$NP_barcode[i])
+	#  df3$time_point[i] <- metadata[idx,"time_point"]
+	#  df3$replicate[i] <- metadata[idx,"replicate"]
+  #}
 
   ##Make line_plot
-  df3_nototal <- subset(df3,select=-c(total_reads_barcodes,total_reads,total_percentage))
+  #df3_nototal <- subset(df3,select=-c(total_reads_barcodes,total_reads,total_percentage))
 
   ##Remove total_reads and total percentage 
-  df3_nototal$time_point <- as.numeric(df3_nototal$time_point)
+  #df3_nototal$time_point <- as.numeric(df3_nototal$time_point)
 
-  df3_melt <- melt(df3_nototal,id=c("NP_barcode","time_point","replicate","sample_id","concentration"))
+  #df3_melt <- melt(df3_nototal,id=c("NP_barcode","time_point","replicate","sample_id","concentration"))
 
 
 
-  summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
-                      conf.interval=.95, .drop=TRUE) {
+  #summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
+  #                    conf.interval=.95, .drop=TRUE) {
 
       # New version of length which can handle NA's: if na.rm==T, don't count them
-      length2 <- function (x, na.rm=FALSE) {
-          if (na.rm) sum(!is.na(x))
-          else       length(x)
-      }
+  #    length2 <- function (x, na.rm=FALSE) {
+  #        if (na.rm) sum(!is.na(x))
+  #        else       length(x)
+  #    }
 
       # This does the summary. For each group's data frame, return a vector with
       # N, mean, and sd
-      datac <- ddply(data, groupvars, .drop=.drop,
-        .fun = function(xx, col) {
-          c(N    = length2(xx[[col]], na.rm=na.rm),
-            mean = mean   (xx[[col]], na.rm=na.rm),
-            sd   = sd     (xx[[col]], na.rm=na.rm)
-          )
-        },
-        measurevar
-      )
+  #    datac <- ddply(data, groupvars, .drop=.drop,
+  #      .fun = function(xx, col) {
+  #        c(N    = length2(xx[[col]], na.rm=na.rm),
+  #          mean = mean   (xx[[col]], na.rm=na.rm),
+  #          sd   = sd     (xx[[col]], na.rm=na.rm)
+  #        )
+  #      },
+  #      measurevar
+  #    )
 
       # Rename the "mean" column    
       # datac <- rename(datac, c("mean" = measurevar))
 
-      datac$se <- datac$sd / sqrt(datac$N)  # Calculate standard error of the mean
+  #    datac$se <- datac$sd / sqrt(datac$N)  # Calculate standard error of the mean
 
       # Confidence interval multiplier for standard error
       # Calculate t-statistic for confidence interval: 
       # e.g., if conf.interval is .95, use .975 (above/below), and use df=N-1
-      ciMult <- qt(conf.interval/2 + .5, datac$N-1)
-      datac$ci <- datac$se * ciMult
+  #    ciMult <- qt(conf.interval/2 + .5, datac$N-1)
+  #    datac$ci <- datac$se * ciMult
 
-      return(datac)
-  }
+  #    return(datac)
+  #}
 
-  summary_df3 <- summarySE(df3_melt,measurevar="value",groupvars=c("time_point","sample_id","concentration","variable"))
+  #summary_df3 <- summarySE(df3_melt,measurevar="value",groupvars=c("time_point","sample_id","concentration","variable"))
 
-  timepoints <- unique(df3_nototal$time_point)
-  a <- min(timepoints)
-  b <- max(timepoints)
+  #timepoints <- unique(df3_nototal$time_point)
+  #a <- min(timepoints)
+  #b <- max(timepoints)
 
   #Make barplots for proportion of reads 
 
   #calculate the number of rows and columns we want based on the number of variables (variables = antibodies/control)
   #We can make it be between 5 and 8 
 
-  ab <- length(unique(summary_df3$sample_id)) ## number of antibodies and control used 
+  #ab <- length(unique(summary_df3$sample_id)) ## number of antibodies and control used 
 
-  if(ab %% 6 == 0){
-    plot_rows <- ab/6
-    plot_cols <- 6
-  }else{
-    plot_rows <- ceiling(ab/6)
-    plot_cols <- 6
-  }
+  #if(ab %% 6 == 0){
+  #  plot_rows <- ab/6
+  #  plot_cols <- 6
+  #}else{
+  #  plot_rows <- ceiling(ab/6)
+  #  plot_cols <- 6
+  #}
 
   ##Make bar plot 
 
-  ggplot(summary_df3,aes(x=concentration,y=mean,fill=variable)) + geom_bar(position="stack",stat="identity") + 
-  theme_classic() + scale_fill_viridis(discrete=TRUE) + facet_wrap(.~sample_id,ncol=plot_cols,nrow=plot_rows) +
-  labs(x="Concentration of antibody",y="Mean proportion of reads",fill="Variant")
+  #ggplot(summary_df3,aes(x=concentration,y=mean,fill=variable)) + geom_bar(position="stack",stat="identity") + 
+  #theme_classic() + scale_fill_viridis(discrete=TRUE) + facet_wrap(.~sample_id,ncol=plot_cols,nrow=plot_rows) +
+  #labs(x="Concentration of antibody",y="Mean proportion of reads",fill="Variant")
 
-  plot_height <- 3.5*plot_rows
+  #plot_height <- 3.5*plot_rows
 
-  ggsave("barplot_barcodes.png",width=12,height=plot_height)
+  #ggsave("barplot_barcodes.png",width=12,height=plot_height)
 
-  summary_df3.2 <- subset(summary_df3,select=-c(ci))
-  write.table(summary_df3.2,file="summary_proportions.txt",sep="\t",quote=F,row.names=F)
+  #summary_df3.2 <- subset(summary_df3,select=-c(ci))
+  #write.table(summary_df3.2,file="summary_proportions.txt",sep="\t",quote=F,row.names=F)
 
-  list_results <- list("reads" = df, "proportions" = df2, "percentages" = df3, "percentages_long" = df3_melt, "summary" = summary_df3.2)
+  #list_results <- list("reads" = df, "proportions" = df2, "percentages" = df3, "percentages_long" = df3_melt, "summary" = summary_df3.2)
+  list_results <- list("reads" = df, "proportions" = df2, "percentages" = df3)
+
   write.xlsx(list_results,file="results.xlsx")
 
 
