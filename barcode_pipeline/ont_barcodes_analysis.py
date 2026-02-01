@@ -456,6 +456,8 @@ def cli():
 
 			internal_barcodes_txt = convert_xlsx_to_txt(args.internal_barcodes)
 			internal_barcodes = internal_barcodes_txt
+			print(internal_barcodes)
+
 
 			##create bam files excluding unmapped reads 
 			print("...creating mapped bam files...")
