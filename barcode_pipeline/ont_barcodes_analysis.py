@@ -435,14 +435,14 @@ def cli():
 
 			##Remove duplicate reads from the bam file 
 
-			sp.run(f'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.bam ]]; then samtools view {out_dir}/{{}}.bam | cut -f1 | sort | uniq -c | awk '$1!=1 {{print $2}}' > {out_dir}{{}}.dupReads; else echo "Skipping {{}}, {{}}.bam not found" >&2; fi"''', shell=True, executable='/bin/bash')
-			sp.run(f'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.bam ]]; then samtools view -h {out_dir}/{{}}.bam | grep -vf {out_dir}/{{}}.dupReads | samtools view -bS -o {out_dir}{{}}.noDup.bam; fi"''', shell=True, executable='/bin/bash')
+			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.bam ]]; then samtools view {out_dir}/{{}}.bam | cut -f1 | sort | uniq -c | awk '\$1!=1 {{print \\$2}}' > {out_dir}/{{}}.dupReads; else echo "Skipping {{}}, {{}}.bam not found" >&2; fi"''', shell=True, executable='/bin/bash')
+			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.bam ]]; then samtools view -h {out_dir}/{{}}.bam | grep -vf {out_dir}/{{}}.dupReads | samtools view -bS -o {out_dir}{{}}.noDup.bam; fi"''', shell=True, executable='/bin/bash')
 
 
 			##Calculate the number of total reads, mapped reads and unmapped reads 
-			sp.run(f'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.noDup.bam ]]; then samtools view {out_dir}/{{}}.noDup.bam | wc -l >> total_reads_{barcode}; else echo "0" >> total_reads_{barcode}; fi"''', shell=True, executable='/bin/bash')
-			sp.run(f'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.noDup.bam ]]; then samtools view -F4 {out_dir}/{{}}.noDup.bam | wc -l >> mapped_reads_{barcode}; else echo "0" >> mapped_reads_{barcode}; fi"''', shell=True, executable='/bin/bash')
-			sp.run(f'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.noDup.bam ]]; then samtools view -f4 {out_dir}/{{}}.noDup.bam | wc -l >> unmapped_reads_{barcode}; else echo "0" >> unmapped_reads_{barcode}; fi"''', shell=True, executable='/bin/bash')
+			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.noDup.bam ]]; then samtools view {out_dir}/{{}}.noDup.bam | wc -l >> total_reads_{barcode}; else echo "0" >> total_reads_{barcode}; fi"''', shell=True, executable='/bin/bash')
+			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.noDup.bam ]]; then samtools view -F4 {out_dir}/{{}}.noDup.bam | wc -l >> mapped_reads_{barcode}; else echo "0" >> mapped_reads_{barcode}; fi"''', shell=True, executable='/bin/bash')
+			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.noDup.bam ]]; then samtools view -f4 {out_dir}/{{}}.noDup.bam | wc -l >> unmapped_reads_{barcode}; else echo "0" >> unmapped_reads_{barcode}; fi"''', shell=True, executable='/bin/bash')
 			sp.run(f'paste list_bams_{barcode} total_reads_{barcode} mapped_reads_{barcode} unmapped_reads_{barcode} > table_number_reads_{barcode}', shell=True)
 
 
@@ -451,7 +451,7 @@ def cli():
 			################################################################--------ANALYSIS------######################################################################
 
 
-			##One mapped, we can extract the number of reads per barcode for each internal barcode 
+			##Once mapped, we can extract the number of reads per barcode for each internal barcode 
 			##We need a file with internal barcodes and variant_id called internal_barcodes.txt
 
 			internal_barcodes_txt = convert_xlsx_to_txt(args.internal_barcodes)
@@ -459,13 +459,13 @@ def cli():
 
 			##create bam files excluding unmapped reads 
 			print("...creating mapped bam files...")
-			sp.run(f'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.noDup.bam ]]; then samtools view -F4 {out_dir}/{{}}.noDup.bam -b -o {out_dir}/{{}}.mapped.bam; fi"''',shell=True, executable='/bin/bash')
+			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.noDup.bam ]]; then samtools view -F4 {out_dir}/{{}}.noDup.bam -b -o {out_dir}/{{}}.mapped.bam; fi"''',shell=True, executable='/bin/bash')
 	
 			print("...counting reads...")
 
-			sp.run(f'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/{barcode}/$line.mapped.bam ]]; then samtools view {out_dir}/{barcode}/$line.mapped.bam | grep {2} | wc -l >> barcode_read_count_{barcode}; else echo "0" >> barcode_read_count_{barcode}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
-			sp.run(f'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/{barcode}/$line.mapped.bam ]]; then samtools view {out_dir}/{barcode}/$line.mapped.bam | grep {2} | awk '{{print $1}}' >> $line.read_ids_with_barcode_{barcpde}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
-			sp.run(f'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants_{barcode}"; done < list_bams_{barcode}''',shell=True)
+			sp.run(rf'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/{barcode}/$line.mapped.bam ]]; then samtools view {out_dir}/{barcode}/$line.mapped.bam | grep {2} | wc -l >> barcode_read_count_{barcode}; else echo "0" >> barcode_read_count_{barcode}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
+			sp.run(rf'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/{barcode}/$line.mapped.bam ]]; then samtools view {out_dir}/{barcode}/$line.mapped.bam | grep {2} | awk '{{print \\$1}}' >> $line.read_ids_with_barcode_{barcpde}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
+			sp.run(rf'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants_{barcode}"; done < list_bams_{barcode}''',shell=True)
 
 
 			if args.allow_mismatch:
@@ -478,7 +478,7 @@ def cli():
 				sp.run(r'paste barcodes_variants barcode_read_count count_reads_mismatch > count_reads_internal_barcodes',shell=True)
 
 			else:
-				sp.run(r'paste barcodes_variants barcode_read_count > count_reads_internal_barcodes',shell=True)
+				sp.run(rf'paste barcodes_variants_{barcode} barcode_read_count_{barcode} > count_reads_internal_barcodes_{barcode}',shell=True)
 		
 
 
