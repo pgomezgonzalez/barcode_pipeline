@@ -455,7 +455,10 @@ def cli():
 			##We need a file with internal barcodes and variant_id called internal_barcodes.txt
 
 			internal_barcodes_txt = convert_xlsx_to_txt(args.internal_barcodes)
-			shutil.copyfile(internal_barcodes_txt,"internal_barcodes")
+			src = Path(internal_barcodes_txt)
+			dst = Path("internal_barcodes")
+			if src.name != dst.name:
+				shutil.copyfile(src, dst)
 
 			##create bam files excluding unmapped reads 
 			print("...creating mapped bam files...")
