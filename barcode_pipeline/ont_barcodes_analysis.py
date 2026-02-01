@@ -503,6 +503,8 @@ def cli():
 			sp.run(rf'paste list_bams_{barcode} coverage_{barcode}.bed > mean_coverage_{barcode}.bed', shell=True)
 			
 			#Calculate coverage at each position and make plots 
+			create_output_directory(out_dir)
+			print(out_dir)
 			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 --col-sep "\t" "if [[ -f {mapping_dir}/{{}}.mapped.bam ]]; then bedtools genomecov -d -ibam {mapping_dir}/{{}}.mapped.bam > {out_dir}/{{}}.cov.bed; fi"''', shell=True, executable='/bin/bash')
 			#sp.run(f'Rscript {script_path}/coverage_plot.R {output_file} {args.region_bed}', shell=True) ##creates coverage line plots for the amplicon region 
 
