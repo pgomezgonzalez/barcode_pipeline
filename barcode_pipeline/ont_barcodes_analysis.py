@@ -435,8 +435,8 @@ def cli():
 
 			##Remove duplicate reads from the bam file 
 
-			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.bam ]]; then samtools view {out_dir}/{{}}.bam | cut -f1 | sort | uniq -c | awk '\$1!=1 {{print \\$2}}' > {out_dir}/{{}}.dupReads; else echo "Skipping {{}}, {{}}.bam not found" >&2; fi"''', shell=True, executable='/bin/bash')
-			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.bam ]]; then samtools view -h {out_dir}/{{}}.bam | grep -vf {out_dir}/{{}}.dupReads | samtools view -bS -o {out_dir}{{}}.noDup.bam; fi"''', shell=True, executable='/bin/bash')
+			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.bam ]]; then samtools view {out_dir}/{{}}.bam | cut -f1 | sort | uniq -c | awk '\$1!=1 {{print \$2}}' > {out_dir}/{{}}.dupReads; else echo "Skipping {{}}, {{}}.bam not found" >&2; fi"''', shell=True, executable='/bin/bash')
+			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.bam ]]; then samtools view -h {out_dir}/{{}}.bam | grep -vf {out_dir}/{{}}.dupReads | samtools view -bS -o {out_dir}/{{}}.noDup.bam; fi"''', shell=True, executable='/bin/bash')
 
 
 			##Calculate the number of total reads, mapped reads and unmapped reads 
@@ -464,7 +464,7 @@ def cli():
 			print("...counting reads...")
 
 			sp.run(rf'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/{barcode}/$line.mapped.bam ]]; then samtools view {out_dir}/{barcode}/$line.mapped.bam | grep {2} | wc -l >> barcode_read_count_{barcode}; else echo "0" >> barcode_read_count_{barcode}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
-			sp.run(rf'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/{barcode}/$line.mapped.bam ]]; then samtools view {out_dir}/{barcode}/$line.mapped.bam | grep {2} | awk '{{print \\$1}}' >> $line.read_ids_with_barcode_{barcpde}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
+			sp.run(rf'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/{barcode}/$line.mapped.bam ]]; then samtools view {out_dir}/{barcode}/$line.mapped.bam | grep {2} | awk '{{print \$1}}' >> $line.read_ids_with_barcode_{barcpde}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
 			sp.run(rf'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants_{barcode}"; done < list_bams_{barcode}''',shell=True)
 
 
