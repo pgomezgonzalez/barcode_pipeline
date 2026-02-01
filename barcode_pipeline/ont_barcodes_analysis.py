@@ -455,7 +455,7 @@ def cli():
 			##We need a file with internal barcodes and variant_id called internal_barcodes.txt
 
 			internal_barcodes_txt = convert_xlsx_to_txt(args.internal_barcodes)
-			internal_barcodes = internal_barcodes_txt
+			internal_barcodes = Path(internal_barcodes_txt).resolve()
 			print(internal_barcodes)
 
 
