@@ -10,12 +10,14 @@ if(any(installed_packages==FALSE)){
   install.packages(pkgs[!installed_packages],repos="https://cran.uk.r-project.org/")
 }
 
-library(ggplot2, quietly=TRUE)
-library(reshape2, quietly=TRUE)
-library(plyr, quietly=TRUE)
-library(dplyr, quietly=TRUE)
-library(openxlsx, quietly=TRUE)
-library(viridis, quietly=TRUE)
+suppressPackageStartupMessages({
+  library(ggplot2, quietly=TRUE)
+  library(reshape2, quietly=TRUE)
+  library(plyr, quietly=TRUE)
+  library(dplyr, quietly=TRUE)
+  library(openxlsx, quietly=TRUE)
+  library(viridis, quietly=TRUE)
+})
 
 #suppressWarnings(
   #read data of count reads (should be called count_reads_internal_barcodes and be tab delimited file with 3 or 4 columns (barcode,variant_id and read_count/read _count_missmatch))

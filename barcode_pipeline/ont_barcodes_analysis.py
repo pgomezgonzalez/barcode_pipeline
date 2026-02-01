@@ -456,7 +456,7 @@ def cli():
 
 			internal_barcodes_txt = convert_xlsx_to_txt(args.internal_barcodes)
 			internal_barcodes = Path(internal_barcodes_txt).resolve()
-			print(internal_barcodes)
+			#print(internal_barcodes)
 
 
 			##create bam files excluding unmapped reads 
@@ -467,7 +467,7 @@ def cli():
 
 			sp.run(rf'''while read line; do echo $line; cat {internal_barcodes} | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/$line.mapped.bam ]]; then samtools view {out_dir}/$line.mapped.bam | grep {{2}} | wc -l >> barcode_read_count_{barcode}; else echo "0" >> barcode_read_count_{barcode}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
 			sp.run(rf'''while read line; do echo $line; cat {internal_barcodes} | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/$line.mapped.bam ]]; then samtools view {out_dir}/$line.mapped.bam | grep {{2}} | awk '{{print \$1}}' >> $line.read_ids_with_barcode_{barcode}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
-			sp.run(rf'''while read line; do cat {internal_barcodes} | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants_{barcode}"; done < list_bams_{barcode}''',shell=True)
+			sp.run(rf'''while read line; do cat {internal_barcodes} | parallel -j 1 --col-sep "\t" "echo $line'\t'{{1}} >> barcodes_variants_{barcode}"; done < list_bams_{barcode}''',shell=True)
 
 
 			if args.allow_mismatch:
@@ -485,37 +485,49 @@ def cli():
 
 
 			#############################################################################-----CALCULATE COVERAGE-----###############################################################################
-	#calculate coverage
-	print("***____calculating coverage____***")
-	sp.run(f'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{{}}.mapped.bam ]]; then bedtools coverage -a {args.region_bed} -b ./mapping/{{}}.mapped.bam >> coverage.bed; else echo "NA" >> coverage.bed; fi"''',shell=True, executable='/bin/bash')
-	sp.run(r'paste list_bams coverage.bed > mean_coverage.bed', shell=True)
-	#Calculate coverage at each position and make plots 
-	sp.run(r'mkdir coverage', shell=True)
-	sp.run(r'''cat list_bams | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/{}.mapped.bam ]]; then bedtools genomecov -d -ibam ./mapping/{}.mapped.bam > ./coverage/{}.cov.bed; fi"''', shell=True, executable='/bin/bash')
-	sp.run(f'Rscript {script_path}/coverage_plot.R {output_file} {args.region_bed}', shell=True) ##creates coverage line plots for the amplicon region 
+		#calculate coverage
+		create_output_directory("coverage")
+		coverage_root = Path("coverage")
+		
+		print("***____calculating coverage____***")
+
+		for barcode_dir in demux_root.iterdir():
+			if not barcode_dir.is_dir():
+				continue
+			barcode = barcode_dir.name 
+			mapping_dir = mapping_root / barcode
+			out_dir = covereage_root / barcode
+			sample_sheet = sample_sheet_dir / f"{barcode}.csv"
+
+			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {mapping_dir}/{{}}.mapped.bam ]]; then bedtools coverage -a {args.region_bed} -b {mapping_dir}/{{}}.mapped.bam >> coverage_{barcode}.bed; else echo "NA" >> coverage_{barcode}.bed; fi"''',shell=True, executable='/bin/bash')
+			sp.run(rf'paste list_bams_{barcode} coverage_{barcode}.bed > mean_coverage_{barcode}.bed', shell=True)
+			
+			#Calculate coverage at each position and make plots 
+			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 --col-sep "\t" "if [[ -f {mapping_dir}/{{}}.mapped.bam ]]; then bedtools genomecov -d -ibam {mapping_dir}/{{}}.mapped.bam > {out_dir}/{{}}.cov.bed; fi"''', shell=True, executable='/bin/bash')
+			#sp.run(f'Rscript {script_path}/coverage_plot.R {output_file} {args.region_bed}', shell=True) ##creates coverage line plots for the amplicon region 
 
 
 	#######################################################################-----MAKE RESULTS TABLE AND PLOTS-----############################################################################
 
-	#Run Rscript to create plots and tables 
-	print("...generating tables and plots...")
-	sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes table_number_reads {output_file}', shell=True)
+			#Run Rscript to create plots and tables 
+			print("...generating tables and plots...")
+			sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes_{barcode} table_number_reads_{barcode} {sample_sheet}', shell=True)
 
 	###Remove temporary files 
-	sp.run(r'rm barcode*.read_ids_with_barcode list_all_bams_final list_bams_final list_demux_bams2', shell=True)
+	#sp.run(r'rm barcode*.read_ids_with_barcode list_all_bams_final list_bams_final list_demux_bams2', shell=True)
 
 	###Rename files with prefix of the run to differentiate 
 	#sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
-	sp.run(f'mv barplot_barcodes.png {args.prefix}.barplot_barcodes.png', shell=True)
-	sp.run(f'mv results.xlsx {args.prefix}.results.xlsx',shell=True)
-	sp.run(f'mv table_reads.txt {args.prefix}.table_reads.txt', shell=True) 
-	sp.run(f'mv table_proportions.txt {args.prefix}.table_proportions.txt', shell=True)
-	sp.run(f'mv table_percentages.txt {args.prefix}.table_percentages.txt', shell=True)
-	sp.run(f'mv internal_barcodes {args.prefix}.internal_barcodes', shell=True)
-	sp.run(f'mv sample_sheet.csv {args.prefix}.sample_sheet.csv', shell=True)
-	sp.run(f'mv summary_proportions.txt {args.prefix}.summary_proportions.txt',shell=True)	
-	sp.run(f'mv mean_coverage.bed {args.prefix}.mean_coverage.bed',shell=True)
+	#sp.run(f'mv barplot_barcodes.png {args.prefix}.barplot_barcodes.png', shell=True)
+	#sp.run(f'mv results.xlsx {args.prefix}.results.xlsx',shell=True)
+	#sp.run(f'mv table_reads.txt {args.prefix}.table_reads.txt', shell=True) 
+	#sp.run(f'mv table_proportions.txt {args.prefix}.table_proportions.txt', shell=True)
+	#sp.run(f'mv table_percentages.txt {args.prefix}.table_percentages.txt', shell=True)
+	#sp.run(f'mv internal_barcodes {args.prefix}.internal_barcodes', shell=True)
+	#sp.run(f'mv sample_sheet.csv {args.prefix}.sample_sheet.csv', shell=True)
+	#sp.run(f'mv summary_proportions.txt {args.prefix}.summary_proportions.txt',shell=True)	
+	#sp.run(f'mv mean_coverage.bed {args.prefix}.mean_coverage.bed',shell=True)
 	#sp.run(f'mv rest_coverage.bed {args.prefix}.rest_coverage.bed', shell=True)
-	sp.run(f'mv coverage_plots.png {args.prefix}.coverage_plots.png', shell=True)
+	#sp.run(f'mv coverage_plots.png {args.prefix}.coverage_plots.png', shell=True)
 
 	print("ALL DONE!")
