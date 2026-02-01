@@ -30,7 +30,7 @@ suppressPackageStartupMessages({
   print(total)
 
   #read metadata file 
-  metadata <- read.table(args[3],sep="\t",header=TRUE,stringsAsFactors=FALSE)
+  metadata <- read.table(args[3],sep=",",header=TRUE,stringsAsFactors=FALSE)
   print(metadata)
 
   #read coverage file (should be 8 columns, but the 5 ones are the important ones: barcode ref start end mean_coverage) - it only covers the barcode region
@@ -47,7 +47,7 @@ suppressPackageStartupMessages({
   df$sample_id <-metadata$sample_id
   df$concentration <- metadata$concentration
   print(df)
-  
+
   for(i in 1:nrow(df)){
 	  subset <- data[which(data$V1==df$NP_barcode[i]),]
 	  if(length(data)==4){
