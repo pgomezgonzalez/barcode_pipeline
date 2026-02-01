@@ -163,7 +163,8 @@ def cli():
 		##We need a file with internal barcodes and variant_id called internal_barcodes.txt
 
 		internal_barcodes_txt = convert_xlsx_to_txt(args.internal_barcodes)
-		shutil.copyfile(internal_barcodes_txt,"internal_barcodes")
+		#shutil.copyfile(internal_barcodes_txt,"internal_barcodes")
+		internal_barcodes = Path(internal_barcodes_txt).resolve()
 
 		##create bam files excluding unmapped reads 
 		print("...creating mapped bam files...")
@@ -171,9 +172,9 @@ def cli():
 	
 		print("...counting reads...")
 
-		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/$line.mapped.bam ]]; then samtools view ./mapping/$line.mapped.bam | grep {2} | wc -l >> barcode_read_count; else echo "0" >>barcode_read_count; fi"; done < list_bams''', shell=True, executable='/bin/bash')
-		sp.run(r'''while read line; do echo $line; cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/$line.mapped.bam ]]; then samtools view ./mapping/$line.mapped.bam | grep {2} | awk '{print \$1}' >> $line.read_ids_with_barcode; fi"; done < list_bams''', shell=True, executable='/bin/bash')
-		sp.run(r'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "echo $line'\t'{1} >> barcodes_variants"; done < list_bams''',shell=True)
+		sp.run(rf'''while read line; do echo $line; cat {internal_barcodes} | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/$line.mapped.bam ]]; then samtools view ./mapping/$line.mapped.bam | grep {{2}} | wc -l >> barcode_read_count; else echo "0" >>barcode_read_count; fi"; done < list_bams''', shell=True, executable='/bin/bash')
+		sp.run(rf'''while read line; do echo $line; cat {internal_barcodes} | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/$line.mapped.bam ]]; then samtools view ./mapping/$line.mapped.bam | grep {{2}} | awk '{{print \$1}}' >> $line.read_ids_with_barcode; fi"; done < list_bams''', shell=True, executable='/bin/bash')
+		sp.run(rf'''while read line; do cat {internal_barcodes} | parallel -j 1 --col-sep "\t" "echo $line'\t'{{1}} >> barcodes_variants"; done < list_bams''',shell=True)
 
 
 		if args.allow_mismatch:
@@ -181,7 +182,7 @@ def cli():
 			sp.run(r'cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.mapped.bam ]]; then samtools view -h ./mapping/{}.mapped.bam | grep -vf {}.read_ids_with_barcode | samtools view -bS -o ./mapping/{}_rest.bam; fi"', shell=True, executable='/bin/bash')
 			#count reads allowing for a mismatch 
 
-			sp.run(f'''while read line; do cat internal_barcodes | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/${{line}}_rest.bam ]]; then samtools view ./mapping/${{line}}_rest.bam | agrep -n{args.mismatch} {{2}} - | wc -l >> count_reads_mismatch; else echo "0" >> count_reads_mismatch; fi"; done < list_bams''',shell=True, executable='/bin/bash')
+			sp.run(rf'''while read line; do cat {internal_barcodes} | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/${{line}}_rest.bam ]]; then samtools view ./mapping/${{line}}_rest.bam | agrep -n{args.mismatch} {{2}} - | wc -l >> count_reads_mismatch; else echo "0" >> count_reads_mismatch; fi"; done < list_bams''',shell=True, executable='/bin/bash')
 				
 			sp.run(r'paste barcodes_variants barcode_read_count count_reads_mismatch > count_reads_internal_barcodes',shell=True)
 
@@ -212,19 +213,19 @@ def cli():
 
 		###Rename files with prefix of the run to differentiate 
 		#sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
-		sp.run(f'mv barplot_barcodes.png {args.prefix}.barplot_barcodes.png', shell=True)
-		sp.run(f'mv results.xlsx {args.prefix}.results.xlsx',shell=True)
-		sp.run(f'mv table_reads.txt {args.prefix}.table_reads.txt', shell=True) 
-		sp.run(f'mv table_proportions.txt {args.prefix}.table_proportions.txt', shell=True)
-		sp.run(f'mv table_percentages.txt {args.prefix}.table_percentages.txt', shell=True)
-		sp.run(f'mv internal_barcodes {args.prefix}.internal_barcodes', shell=True)
-		sp.run(f'mv sample_sheet.csv {args.prefix}.sample_sheet.csv', shell=True)
-		sp.run(f'mv summary_proportions.txt {args.prefix}.summary_proportions.txt',shell=True)	
-		sp.run(f'mv mean_coverage.bed {args.prefix}.mean_coverage.bed',shell=True)
+		sp.run(f'mv barplot_barcodes.png {args.prefix}.barplot_barcodes.png', shell=True, check=False)
+		sp.run(f'mv results.xlsx {args.prefix}.results.xlsx',shell=True, check=False)
+		sp.run(f'mv table_reads.txt {args.prefix}.table_reads.txt', shell=True,check=False) 
+		sp.run(f'mv table_proportions.txt {args.prefix}.table_proportions.txt', shell=True, check=False)
+		sp.run(f'mv table_percentages.txt {args.prefix}.table_percentages.txt', shell=True,check=False)
+		sp.run(f'mv internal_barcodes {args.prefix}.internal_barcodes', shell=True, check=False)
+		sp.run(f'mv sample_sheet.csv {args.prefix}.sample_sheet.csv', shell=True, check=False)
+		sp.run(f'mv summary_proportions.txt {args.prefix}.summary_proportions.txt',shell=True,check=False)	
+		sp.run(f'mv mean_coverage.bed {args.prefix}.mean_coverage.bed',shell=True, check=False)
 		#sp.run(f'mv rest_coverage.bed {args.prefix}.rest_coverage.bed', shell=True)
-		sp.run(f'mv coverage_plots.png {args.prefix}.coverage_plots.png', shell=True)
+		sp.run(f'mv coverage_plots.png {args.prefix}.coverage_plots.png', shell=True, check=False)
 
-		print("ALL DONE!")
+		print("***********--------ALL DONE--------***********")
 
 
 	#######################################################################################################################################################################################
@@ -516,20 +517,20 @@ def cli():
 			sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes_{barcode} table_number_reads_{barcode} {sample_sheet}', shell=True)
 
 	###Remove temporary files 
-	#sp.run(r'rm barcode*.read_ids_with_barcode list_all_bams_final list_bams_final list_demux_bams2', shell=True)
+	sp.run(r'rm barcode*.read_ids_with_barcode* list_all_bams_final* list_bams_final* list_demux_bams2*', shell=True)
 
 	###Rename files with prefix of the run to differentiate 
 	#sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
 	#sp.run(f'mv barplot_barcodes.png {args.prefix}.barplot_barcodes.png', shell=True)
-	#sp.run(f'mv results.xlsx {args.prefix}.results.xlsx',shell=True)
-	#sp.run(f'mv table_reads.txt {args.prefix}.table_reads.txt', shell=True) 
-	#sp.run(f'mv table_proportions.txt {args.prefix}.table_proportions.txt', shell=True)
-	#sp.run(f'mv table_percentages.txt {args.prefix}.table_percentages.txt', shell=True)
-	#sp.run(f'mv internal_barcodes {args.prefix}.internal_barcodes', shell=True)
+	sp.run(rf'mv results*.xlsx {args.prefix}.results*.xlsx',shell=True,check=False)
+	sp.run(f'mv table_reads*.txt {args.prefix}.table_reads*.txt', shell=True,check=False) 
+	sp.run(f'mv table_proportions*.txt {args.prefix}.table_proportions*.txt', shell=True,check=False)
+	sp.run(f'mv table_percentages*.txt {args.prefix}.table_percentages*.txt', shell=True, check=False)
+	sp.run(f'mv internal_barcodes* {args.prefix}.internal_barcodes*', shell=True, check=False)
 	#sp.run(f'mv sample_sheet.csv {args.prefix}.sample_sheet.csv', shell=True)
 	#sp.run(f'mv summary_proportions.txt {args.prefix}.summary_proportions.txt',shell=True)	
-	#sp.run(f'mv mean_coverage.bed {args.prefix}.mean_coverage.bed',shell=True)
+	sp.run(f'mv mean_coverage*.bed {args.prefix}.mean_coverage*.bed',shell=True, check=False)
 	#sp.run(f'mv rest_coverage.bed {args.prefix}.rest_coverage.bed', shell=True)
 	#sp.run(f'mv coverage_plots.png {args.prefix}.coverage_plots.png', shell=True)
 
-	print("ALL DONE!")
+	print("***********--------ALL DONE--------***********")

@@ -71,7 +71,8 @@ suppressPackageStartupMessages({
 	#  df$replicate[i] <- metadata[idx,"replicate"]
   #}
 
-
+  name_run <- args[1]
+  name_run <- strsplit(name_run,"_")[[1]]
 
   #make a normalised column per each of them 
   mat1 <- as.matrix(df[1:nrow(df),1:length(internal_barcodes)])
@@ -82,7 +83,13 @@ suppressPackageStartupMessages({
   mat3 <- as.data.frame(mat3)
   mat3$total_percentage <- rowSums(mat3)
 
-  write.table(df,file="table_reads.txt",sep="\t",quote=F,row.names=F)
+  if(length(name_run)==5){
+    barcode_name <- name_run[5]
+    write.table(df,file=paste("table_reads_",barcode_name,".txt",sep=""),sep="\t",quote=F,row.names=F)
+  }else{
+    write.table(df,file="table_reads.txt",sep="\t",quote=F,row.names=F)
+  }
+
 
   df2 <- as.data.frame(mat2)
   df2$NP_barcode <- NP_barcodes
@@ -98,9 +105,13 @@ suppressPackageStartupMessages({
 	#  df2$time_point[i] <- metadata[idx,"time_point"]
 	#  df2$replicate[i] <- metadata[idx,"replicate"]
   #}
-
-  write.table(df2,file="table_proportions.txt",sep="\t",quote=F,row.names=F)
-
+  if(length(name_run)==5){
+    barcode_name <- name_run[5]
+    write.table(df2,file=paste("table_proportions_",barcode_name,".txt",sep=""),sep="\t",quote=F,row.names=F)
+  }else{
+    write.table(df2,file="table_proportions.txt",sep="\t",quote=F,row.names=F)
+  }
+  
   df3 <- as.data.frame(mat3)
   df3$NP_barcode <- NP_barcodes
   df3$sample_id <- df$sample_id
@@ -116,7 +127,13 @@ suppressPackageStartupMessages({
 	#  df3$replicate[i] <- metadata[idx,"replicate"]
   #}
 
-  write.table(df3,file="table_percentages.txt",sep="\t",quote=F,row.names=F)
+  if(length(name_run)==5){
+    barcode_name <- name_run[5]
+    write.table(df2,file=paste("table_percentages_",barcode_name,".txt",sep=""),sep="\t",quote=F,row.names=F)
+  }else{
+    write.table(df3,file="table_percentages.txt",sep="\t",quote=F,row.names=F)
+  }
+
 
   #generate averages by timepoint and by antibody used using the replicates
 
@@ -211,8 +228,7 @@ suppressPackageStartupMessages({
   #list_results <- list("reads" = df, "proportions" = df2, "percentages" = df3, "percentages_long" = df3_melt, "summary" = summary_df3.2)
   list_results <- list("reads" = df, "proportions" = df2, "percentages" = df3)
 
-  name_run <- args[1]
-  name_run <- strsplit(name_run,"_")[[1]]
+ 
   if(length(name_run)==5){
     barcode_name <- name_run[5]
     write.xlsx(list_results,file=paste("results_",barcode_name,".xlsx",sep=""))
