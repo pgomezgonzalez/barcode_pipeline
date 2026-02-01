@@ -484,7 +484,7 @@ def cli():
 		
 
 
-			#############################################################################-----CALCULATE COVERAGE-----###############################################################################
+		#############################################################################-----CALCULATE COVERAGE-----###############################################################################
 		#calculate coverage
 		create_output_directory("coverage")
 		coverage_root = Path("coverage")
@@ -496,7 +496,7 @@ def cli():
 				continue
 			barcode = barcode_dir.name 
 			mapping_dir = mapping_root / barcode
-			out_dir = covereage_root / barcode
+			out_dir = coverage_root / barcode
 			sample_sheet = sample_sheet_dir / f"{barcode}.csv"
 
 			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {mapping_dir}/{{}}.mapped.bam ]]; then bedtools coverage -a {args.region_bed} -b {mapping_dir}/{{}}.mapped.bam >> coverage_{barcode}.bed; else echo "NA" >> coverage_{barcode}.bed; fi"''',shell=True, executable='/bin/bash')
