@@ -21,30 +21,46 @@ library(ggplot2, quietly=TRUE)
         subset <- list_cov[[i]]
         subset$barcode <- names(list_cov)[[i]]
         subset$sample_id <- metadata$sample_id[id]
+        subset$alias <- metadata$alias[id]
         subset$concentration <- metadata$concentration[id]
         subset$replicate <- paste("Replicate ",metadata$replicate[id],sep="")
         list_cov[[i]] <- subset
+    }
+
+    barcodes_used <- metadata$barcode
+    if(length(names(list_cov))!=length(barcodes_used)){
+        x <- which(!barcodes_used%in%names(list_cov))
+        list_cov2 <-  
     }
 
     ##Combine all data frames from list
     combined_list <- do.call(rbind, list_cov)
 
     ##Make data frame for region of barcode 
-    data_barcode_region <- data.frame(matrix(nrow=length(unique(metadata$sample_id)),ncol=3))
-    colnames(data_barcode_region) <- c("sample_id","start","end")
-    data_barcode_region$sample_id <- unique(metadata$sample_id)
+    #data_barcode_region <- data.frame(matrix(nrow=length(unique(metadata$sample_id)),ncol=3))
+    data_barcode_region <- data.frame(matrix(nrow=length(unique(metadata$alias)),ncol=3))
+    #colnames(data_barcode_region) <- c("sample_id","start","end")
+    colnames(data_barcode_region) <- c("alias","start","end")
+    #data_barcode_region$sample_id <- unique(metadata$sample_id)
+    data_barcode_region$alias <- unique(metadata$alias)
     region_data <- read.table(args[2],sep="\t",header=FALSE,stringsAsFactors = FALSE)
     data_barcode_region$start <- as.numeric(region_data$V2)
     data_barcode_region$end <- as.numeric(region_data$V3)
 
-    max_y_vals <- combined_list %>% group_by(sample_id) %>% summarise(max_y = max(V3))
-    merged <- left_join(max_y_vals,data_barcode_region,by="sample_id")
+    #max_y_vals <- combined_list %>% group_by(sample_id) %>% summarise(max_y = max(V3))
+    max_y_vals <- combined_list %>% group_by(alias) %>% summarise(max_y = max(V3))
+    #merged <- left_join(max_y_vals,data_barcode_region,by="sample_id")
+    merged <- left_join(max_y_vals,data_barcode_region,by="alias")
 
     combined_list$concentration <- as.factor(combined_list$concentration)
 
-    ggplot(combined_list, aes(x=V2,y=V3,color=concentration)) + geom_line(linewidth=0.2) + theme_classic() + facet_grid(sample_id~replicate, scales="free") +
+    ggplot(combined_list, aes(x=V2,y=V3,color=concentration)) + geom_line(linewidth=0.2) + theme_classic() + facet_wrap(~alias,scales="free") + 
     geom_rect(data=merged,inherit.aes=FALSE,aes(xmin=start,xmax=end,ymin=0,ymax=max_y),fill="orange",alpha=0.2) +
     xlab("gene position (bp)") + ylab("coverage")
+
+    #ggplot(combined_list, aes(x=V2,y=V3,color=concentration)) + geom_line(linewidth=0.2) + theme_classic() + facet_grid(sample_id~replicate, scales="free") +
+    #geom_rect(data=merged,inherit.aes=FALSE,aes(xmin=start,xmax=end,ymin=0,ymax=max_y),fill="orange",alpha=0.2) +
+    #xlab("gene position (bp)") + ylab("coverage")
 
     ggsave("coverage_plots.png")
 
