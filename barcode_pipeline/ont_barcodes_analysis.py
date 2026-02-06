@@ -38,18 +38,21 @@ def cli():
 
 	#function to convert xlsx file to txt tab del
 	def convert_xlsx_to_txt(file_name):
+		output_files = []
 		#check if it's xlsx 
-		if file_name.lower().endswith('.xlsx'):
-			print(f"Converting {file_name} to tab-delimited .txt file...")
-			df = pd.read_excel(file_name, engine='openpyxl')
-			output_file = file_name.replace('xlsx','txt')
-			df.to_csv(output_file, sep="\t", index=False)
-			return output_file
-		else:
-			print(f'{file_name} already a txt file.')
-			output_file=file_name
-			return output_file 
-
+		for fname in file_name:
+			if fname.lower().endswith('.xlsx'):
+				print(f"Converting {fname} to tab-delimited .txt file...")
+				df = pd.read_excel(fname, engine='openpyxl')
+				output_file = fname.replace('xlsx','txt')
+				df.to_csv(output_file, sep="\t", index=False)
+				output_file = fname
+			else:
+				print(f'{fname} already a txt file.')
+				output_file = fname
+			
+			output_files.append(output_file)
+		return output_files
 
 	def create_output_directory(directory_name):
 		#check if demux directory already exists
