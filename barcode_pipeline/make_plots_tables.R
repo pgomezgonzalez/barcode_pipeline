@@ -47,11 +47,17 @@ suppressPackageStartupMessages({
   for(i in 1:nrow(df)){
 	  subset <- data[which(data$V1==df$NP_barcode[i]),]
 	  if(length(data)==4){
-      reads <- subset$V3 + subset$V4
-    }else{
-      reads <- subset$V3
+      if(nrow(subset)>0){
+        reads <- subset$V3 + subset$V4
+        df[i,1:length(internal_barcodes)] <- reads
+      }
     }
-	  df[i,1:length(internal_barcodes)] <- reads
+    if(length(data==3)){
+      if(nrow(data)>0){
+        reads <- subset$V3)
+        df[i,1:length(internal_barcodes)] <- reads
+      }
+    }  
   }
 
   df$total_reads_barcodes <- rowSums(df[1:length(internal_barcodes)])
