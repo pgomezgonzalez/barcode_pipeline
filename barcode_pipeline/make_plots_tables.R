@@ -60,9 +60,11 @@ suppressPackageStartupMessages({
   df$total_reads_barcodes <- rowSums(df[1:length(internal_barcodes)])
   for(i in 1:nrow(df)){
     idx <- which(total$V1==df$NP_barcode[i])
-    df$total_reads[i] <- total$V2[idx]
-    df$mapped_reads[i] <- total$V3[idx]
-    df$unmapped_reads[i] <- total$V4[idx]
+    if(length(idx)>0){
+      df$total_reads[i] <- total$V2[idx]
+      df$mapped_reads[i] <- total$V3[idx]
+      df$unmapped_reads[i] <- total$V4[idx]
+    }
   }
 
   #df$time_point <- "" 
