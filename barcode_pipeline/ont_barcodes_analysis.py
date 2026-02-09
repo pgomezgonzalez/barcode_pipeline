@@ -98,9 +98,11 @@ def cli():
 		############################################################################################################################################################
 		##############################################################--------DEMULTIPLEXING------##################################################################
 
+		sp.run(f'Rscript {script_path}/make_dorado_samplesheet.R {output_file} sample_sheet', shell=True)
 		#Demultiplex into NB barcodes. It should create 1 bam file per barcode in demux directory
 		print("...demultiplexing...")
-		sp.run(f'dorado demux --output-dir demux --no-classify --emit-summary {args.output}.bam', shell=True)
+		#sp.run(f'dorado demux --output-dir demux --no-classify --emit-summary {args.output}.bam', shell=True)
+		sp.run(f'dorado demux --output-dir demux --kit-name {kit_name} --sample-sheet sample_sheet.csv --emit-summary {args.output}.bam', shell=True)
 
 
 		############################################################################################################################################################
