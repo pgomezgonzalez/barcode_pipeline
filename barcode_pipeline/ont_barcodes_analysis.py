@@ -104,7 +104,25 @@ def cli():
 		#sp.run(f'dorado demux --output-dir demux --no-classify --emit-summary {args.output}.bam', shell=True)
 		sp.run(f'dorado demux --output-dir demux --kit-name {kit_name} --sample-sheet sample_sheet.csv --emit-summary {args.output}.bam', shell=True)
 
+		sample_sheet = Path("sample_sheet.csv")
+		df = pd.read_csv(sample_sheet)
 
+		barcode_alias = dict(
+			zip(df["alias"], df["barcode"])
+		)
+		
+		bam_dir = Path("demux")
+
+		for bam in bam_dir.rglob("*.bam"):
+			for alias, barcode in barcode_alias.items():
+				if alias in bam.name:
+					new_name = f"NB_{barcode}.bam"
+					new_path = bam.with_name(new_name)
+					print(f"Renaming {bam} to {new_path}")
+					bam.rename(new_path)
+					break
+
+		
 		############################################################################################################################################################
 		############################################################################################################################################################
 		################################################################--------FILTERING------#####################################################################
