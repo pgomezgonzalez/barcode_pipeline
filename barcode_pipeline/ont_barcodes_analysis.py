@@ -128,7 +128,7 @@ def cli():
 
 		###Trim the adapters and primers (for dual barcoding, this has not been done during basecalling)
 		
-		for bam in barcode_dir.rglob("*.bam"):
+		for bam in bam_dir.rglob("*.bam"):
 			if bam.name.endswith(".trimmed.bam"):
 				continue
 			trimmed = bam.with_suffix(".trimmed.bam")
