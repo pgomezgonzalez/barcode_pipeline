@@ -122,7 +122,20 @@ def cli():
 					bam.rename(new_path)
 					break
 
+		############################################################################################################################################################
+		############################################################################################################################################################
+		################################################################--------TRIMMING------#####################################################################
+
+		###Trim the adapters and primers (for dual barcoding, this has not been done during basecalling)
 		
+		for bam in barcode_dir.rglob("*.bam"):
+			if bam.name.endswith(".trimmed.bam"):
+				continue
+			trimmed = bam.with_suffix(".trimmed.bam")
+
+			sp.run(f'dorado trim {bam} --sequencing-kit {kit_name} > {trimmed}',shell=True,check=True)
+
+		##trimmed bams should be called barcodeXX.trimmed.bam 
 		############################################################################################################################################################
 		############################################################################################################################################################
 		################################################################--------FILTERING------#####################################################################
@@ -130,24 +143,24 @@ def cli():
 		#Filter the reads based on quality score >=8
 		create_output_directory("fastqs")
 
-		if not args.skip_basecalling:
+		#if not args.skip_basecalling:
 
-			sp.run(r"""ls ./demux/*barcode*.bam | sed 's/.*\(barcode[0-9]*\)\.bam/\1/' > list_bams""", shell=True)
-			sp.run(r'ls ./demux/*barcode*.bam > list_demux_bams2',shell=True)
-			sp.run(r'paste list_demux_bams2 list_bams > list_bams_final',shell=True)
-			sp.run(r'''cat list_bams_final | parallel -j 1 --col-sep "\t" "samtools view -b -e '[qs]>=8' {1} | samtools fastq - | pigz -c > ./fastqs/{2}.fastq.gz"''',shell=True)
+		sp.run(r"""ls ./demux/*barcode*.trimmed.bam | sed 's/.*\(barcode[0-9]*\)\.trimmed.bam/\1/' > list_bams""", shell=True)
+		sp.run(r'ls ./demux/*barcode*.trimmed.bam > list_demux_bams2',shell=True)
+		sp.run(r'paste list_demux_bams2 list_bams > list_bams_final',shell=True)
+		sp.run(r'''cat list_bams_final | parallel -j 1 --col-sep "\t" "samtools view -b -e '[qs]>=8' {1} | samtools fastq - | pigz -c > ./fastqs/{2}.fastq.gz"''',shell=True)
 	
-		else:
-			print("removing not used barcodes")
-			sp.run(r"""ls ./demux/*barcode*.bam | sed 's/.*\(barcode[0-9]*\)\.bam/\1/' > list_bams""", shell=True)
-			sp.run(r'ls ./demux/*barcode*.bam > list_demux_bams2',shell=True)
-			sp.run(r'paste list_demux_bams2 list_bams > list_all_bams_final',shell=True)
-			sp.run(f'Rscript {script_path}/barcodes_used.R {output_file}',shell=True)
-			sp.run(r'cat barcodes_used | parallel -j 1 "grep {} list_all_bams_final" > list_bams_final', shell=True)
-			#change name of barcodes_used to list_bams to be the same as in running basecalling
-			sp.run(r'mv barcodes_used list_bams', shell=True)
-			print("...filtering and creating fastqs...")
-			sp.run(r'''cat list_bams_final | parallel -j 1 --col-sep "\t" "samtools view -b -e '[qs]>=8' {1} | samtools fastq - | pigz -c > ./fastqs/{2}.fastq.gz"''',shell=True)
+		#else:
+		#	print("removing not used barcodes")
+		#	sp.run(r"""ls ./demux/*barcode*.bam | sed 's/.*\(barcode[0-9]*\)\.bam/\1/' > list_bams""", shell=True)
+		#	sp.run(r'ls ./demux/*barcode*.bam > list_demux_bams2',shell=True)
+		#	sp.run(r'paste list_demux_bams2 list_bams > list_all_bams_final',shell=True)
+		#	sp.run(f'Rscript {script_path}/barcodes_used.R {output_file}',shell=True)
+		#	sp.run(r'cat barcodes_used | parallel -j 1 "grep {} list_all_bams_final" > list_bams_final', shell=True)
+		#	#change name of barcodes_used to list_bams to be the same as in running basecalling
+		#	sp.run(r'mv barcodes_used list_bams', shell=True)
+		#	print("...filtering and creating fastqs...")
+		#	sp.run(r'''cat list_bams_final | parallel -j 1 --col-sep "\t" "samtools view -b -e '[qs]>=8' {1} | samtools fastq - | pigz -c > ./fastqs/{2}.fastq.gz"''',shell=True)
 
 
 		############################################################################################################################################################
