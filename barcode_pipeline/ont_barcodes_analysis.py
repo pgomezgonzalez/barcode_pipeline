@@ -18,7 +18,7 @@ def cli():
 
 	argparser = argparse.ArgumentParser(description="Basecalling and demultiplexing of ONT pod5 data with dorado followed by internal barcodes analysis")
 
-	argparser.add_argument("--metadata","-m",nargs="+",help="metadata with experiment_id, nanopore_run_id, flow_cell_id, kit, sample_id, barcode, alias, concentration, time_point, replicate (example in metadata_template.xlsx)", required=True)
+	argparser.add_argument("--metadata","-m",help="metadata with experiment_id, nanopore_run_id, flow_cell_id, kit, sample_id, barcode, alias, concentration, time_point, replicate (example in metadata_template.xlsx)", required=True)
 	#argparser.add_argument("sample_sheet",help="name of sample sheet for dorado basecalling")
 	#argparser.add_argument("kit_name", help="name of the kit used")
 	argparser.add_argument("--data", "-d",help="the data directory (folder with all pod5 files)",required=True)
@@ -67,8 +67,7 @@ def cli():
 
 	if args.nBarcodes == "simple":
 
-		#output_file = convert_xlsx_to_txt(args.metadata)
-		output_file = args.metadata
+		output_file = convert_xlsx_to_txt(args.metadata)
 		kit_name = get_kit_name(output_file)
 	
 		sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
