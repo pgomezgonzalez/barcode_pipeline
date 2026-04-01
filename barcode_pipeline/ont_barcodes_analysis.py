@@ -259,7 +259,7 @@ def cli():
 		sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes table_number_reads {output_file}', shell=True)
 
 		###Remove temporary files 
-		sp.run(r'rm barcode*.read_ids_with_barcode list_all_bams_final list_bams_final list_demux_bams2', shell=True)
+		sp.run(r'rm barcode*.read_ids_with_barcode list_bams_final list_demux_bams2', shell=True)
 
 		###Rename files with prefix of the run to differentiate 
 		#sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
@@ -393,7 +393,7 @@ def cli():
 			sample_sheet = f"{barcode}.csv"
 			for bam in bam_dir.glob(f"*{barcode}*.bam"):
 				if barcode in bam.name:
-					sp.run(f'dorado demux --output-dir ./demux_NB/{barcode} --kit-name {kit_name} --sample-sheet {sample_sheet} --emit-summary {bam}', shell=True)
+					sp.run(f'dorado demux --output-dir ./demux_NB/{barcode} --kit-name {kit_name} --sample-sheet {sample_sheet} --barcode-both-ends --emit-summary {bam}', shell=True)
 
 		##same as before, bam files will be called by the alias instead of the barcode, change back to the barcode name 
 
@@ -567,7 +567,7 @@ def cli():
 			sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes_{barcode} table_number_reads_{barcode} {sample_sheet}', shell=True)
 
 	###Remove temporary files 
-	sp.run(r'rm barcode*.read_ids_with_barcode* list_all_bams_final* list_bams_final* list_demux_bams2*', shell=True)
+	sp.run(r'rm barcode*.read_ids_with_barcode* list_bams_final* list_demux_bams2*', shell=True)
 
 	###Rename files with prefix of the run to differentiate 
 	#sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
