@@ -429,7 +429,7 @@ def cli():
 		################################################################--------TRIMMING------#####################################################################
 
 		###Trim the adapters and primers (for dual barcoding, this has not been done during basecalling)
-		kit_name = get_kit_name(NB_meta)
+		kit_name = get_kit_name(output_file)
 
 		for barcode_dir in demux_root.iterdir():
 			if not barcode_dir.is_dir():
