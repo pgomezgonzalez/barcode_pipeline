@@ -18,7 +18,7 @@ def cli():
 
 	argparser = argparse.ArgumentParser(description="Basecalling and demultiplexing of ONT pod5 data with dorado followed by internal barcodes analysis")
 
-	argparser.add_argument("--metadata","-m",help="metadata with experiment_id, nanopore_run_id, flow_cell_id, kit, sample_id, barcode, alias, concentration, time_point, replicate (example in metadata_template.xlsx)", required=True)
+	argparser.add_argument("--metadata","-m",nargs="+",help="metadata with experiment_id, nanopore_run_id, flow_cell_id, kit, sample_id, barcode, alias, concentration, time_point, replicate (example in metadata_template.xlsx)", required=True)
 	#argparser.add_argument("sample_sheet",help="name of sample sheet for dorado basecalling")
 	#argparser.add_argument("kit_name", help="name of the kit used")
 	argparser.add_argument("--data", "-d",help="the data directory (folder with all pod5 files)",required=True)
@@ -31,7 +31,7 @@ def cli():
 	argparser.add_argument("--only-basecalling",action="store_true", help="Only perform basecalling")
 	argparser.add_argument("--allow-mismatch", action="store_true", help="on reads where no exact match for internal barcodes has been found, allow for a mismatch")
 	argparser.add_argument("--mismatch",type=int, help="number of mismatches allowed",default=1)
-	argparser.add_argument("--nBarcodes",choices=["simple","dual"],required=True,help="Rounds of barcodes used to multiplex: simple if 1 native barcode, dual if PCR barcodes + native barcodes")
+	argparser.add_argument("--nBarcodes",choices=["single","dual"],required=True,help="Rounds of barcodes used to multiplex: single if 1 native barcode, dual if PCR barcodes + native barcodes")
 	argparser.add_argument("--dualBarcodeData",help="metadata with Native barcodes used and correspondent metadata file (experiment_id, flow_cell_id, kit, barcode, alias, metadata_file_name)")
 
 	args = argparser.parse_args()
@@ -65,31 +65,48 @@ def cli():
 		return kit_name
 
 
-	if args.nBarcodes == "simple":
+	############################################################################################################################################################
+	############################################################################################################################################################
+	################################################################--------BASECALLING------###################################################################
 
-		output_file = convert_xlsx_to_txt(args.metadata)
-		kit_name = get_kit_name(output_file)
+
+	if not args.skip_basecalling:
+						
+		#Run dorado basecaller 
+		#Do not trim the reads, so we keep all barcodes for double round of demux
+		#Do not used sample sheet for basecalling, simply basecall
+
+		print("...starting basecalling...")
+		sp.run(f'dorado basecaller --min-qscore 10 --no-trim -r sup {args.data} > {args.output}.bam', shell=True)
+
+		if args.only_basecalling:
+			sys.exit("...basecalling finished...EXITING...")
+		
+	else:
+		print("...SKIPPING BASECALLING...")
+
+
+	######-------For single NB barcodes-------######
+
+	if args.nBarcodes == "single":
+		
+		output_files = []
+		for file_name in args.metadata:
+			output_file = convert_xlsx_to_txt(file_name)
+			output_files.append(output_file)
+
+		for output_file in output_files:
+			sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
+
+			kit_name = get_kit_name(output_file)
 	
-		sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
+		
 
-		############################################################################################################################################################
-		############################################################################################################################################################
-		################################################################--------BASECALLING------###################################################################
+			
 
-		if not args.skip_basecalling:
 			##Make sample_sheet from metadata 
 			print("*****Generating sample sheet*****")
-			sp.run(f'Rscript {script_path}/make_dorado_samplesheet.R {output_file} sample_sheet', shell=True)
-
-			#Run dorado basecaller 
-			print("...starting basecalling...")
-			sp.run(f'dorado basecaller --min-qscore 10 --kit-name {kit_name} --sample-sheet sample_sheet.csv -r sup {args.data} > {args.output}.bam', shell=True)
-
-			if args.only_basecalling:
-				sys.exit("...basecalling finished...EXITING...")
-		
-		else:
-			print("...SKIPPING BASECALLING...")
+			sp.run(f'Rscript {script_path}/make_dorado_samplesheet.R {output_file} ', shell=True)
 
 
 		create_output_directory("demux")
