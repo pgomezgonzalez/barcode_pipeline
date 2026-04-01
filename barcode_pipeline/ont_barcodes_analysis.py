@@ -386,7 +386,7 @@ def cli():
 		for barcode in barcode_map.values():
 			create_output_directory(os.path.join("demux_NB",barcode))
 		
-
+		kit_name = get_kit_name(output_file)
 		print("...demultiplexing ROUND 2...")
 		bam_dir = Path("demux_NB")
 		for barcode in barcode_map.values():
