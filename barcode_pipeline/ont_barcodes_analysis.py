@@ -219,7 +219,7 @@ def cli():
 		##create bam files excluding unmapped reads 
 		print("...creating mapped bam files...")
 		sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.noDup.bam ]]; then samtools view -F4 ./mapping/{}.noDup.bam -b -o ./mapping/{}.mapped.bam; fi"''',shell=True, executable='/bin/bash')
-	
+		sp.run(r'''cat list_bams | parallel -j 1 "if [[ -f ./mapping/{}.mapped.bam ]]; them samtools index ./mapping/{}.mapped.bam; fi"''',shell=True,executable='/bin/bash')
 		print("...counting reads...")
 
 		sp.run(rf'''while read line; do echo $line; cat {internal_barcodes} | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/$line.mapped.bam ]]; then samtools view ./mapping/$line.mapped.bam | grep {{2}} | wc -l >> barcode_read_count; else echo "0" >>barcode_read_count; fi"; done < list_bams''', shell=True, executable='/bin/bash')
@@ -513,7 +513,7 @@ def cli():
 			##create bam files excluding unmapped reads 
 			print("...creating mapped bam files...")
 			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.noDup.bam ]]; then samtools view -F4 {out_dir}/{{}}.noDup.bam -b -o {out_dir}/{{}}.mapped.bam; fi"''',shell=True, executable='/bin/bash')
-	
+			sp.run(rf'''cat list_bams_{barcode} | parallel -j 1 "if [[ -f {out_dir}/{{}}.mapped.bam ]]; them samtools index {out_dir}/{{}}.mapped.bam; fi"''',shell=True,executable='/bin/bash')
 			print("...counting reads...")
 
 			sp.run(rf'''while read line; do echo $line; cat {internal_barcodes} | parallel -j 1 --col-sep "\t" "if [[ -f {out_dir}/$line.mapped.bam ]]; then samtools view {out_dir}/$line.mapped.bam | grep {{2}} | wc -l >> barcode_read_count_{barcode}; else echo "0" >> barcode_read_count_{barcode}; fi"; done < list_bams_{barcode}''', shell=True, executable='/bin/bash')
