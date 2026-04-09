@@ -256,7 +256,7 @@ def cli():
 
 		#Run Rscript to create plots and tables 
 		print("...generating tables and plots...")
-		sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes table_number_reads {output_file}', shell=True)
+		sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes table_number_reads sample_sheet.csv', shell=True)
 
 		###Remove temporary files 
 		sp.run(r'rm barcode*.read_ids_with_barcode list_bams_final list_demux_bams2', shell=True)
