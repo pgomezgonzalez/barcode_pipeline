@@ -249,7 +249,7 @@ def cli():
 		#Calculate coverage at each position and make plots 
 		sp.run(r'mkdir coverage', shell=True)
 		sp.run(r'''cat list_bams | parallel -j 1 --col-sep "\t" "if [[ -f ./mapping/{}.mapped.bam ]]; then bedtools genomecov -d -ibam ./mapping/{}.mapped.bam > ./coverage/{}.cov.bed; fi"''', shell=True, executable='/bin/bash')
-		sp.run(f'Rscript {script_path}/coverage_plot.R {output_file} {args.region_bed}', shell=True) ##creates coverage line plots for the amplicon region 
+		#sp.run(f'Rscript {script_path}/coverage_plot.R {output_file} {args.region_bed}', shell=True) ##creates coverage line plots for the amplicon region 
 
 
 		#######################################################################-----MAKE RESULTS TABLE AND PLOTS-----############################################################################

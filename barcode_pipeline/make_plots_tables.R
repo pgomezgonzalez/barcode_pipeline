@@ -58,6 +58,9 @@ suppressPackageStartupMessages({
     
 
   df$total_reads_barcodes <- rowSums(df[1:length(internal_barcodes)])
+  df$total_reads <- NA
+  df$mapped_reads <- NA 
+  df$unmapped_reads <- NA
   for(i in 1:nrow(df)){
     idx <- which(total$V1==df$NP_barcode[i])
     if(length(idx)>0){
