@@ -567,7 +567,7 @@ def cli():
 			sp.run(f'Rscript {script_path}/make_plots_tables.R count_reads_internal_barcodes_{barcode} table_number_reads_{barcode} {sample_sheet}', shell=True)
 
 	###Remove temporary files 
-	#sp.run(r'rm barcode*.read_ids_with_barcode* list_bams_final* list_demux_bams2*', shell=True)
+	sp.run(r'rm barcode*.read_ids_with_barcode* list_bams_final* list_demux_bams2*', shell=True)
 
 	###Rename files with prefix of the run to differentiate 
 	#sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
