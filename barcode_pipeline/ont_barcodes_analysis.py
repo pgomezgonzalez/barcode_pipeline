@@ -90,12 +90,12 @@ def cli():
 
 	if args.nBarcodes == "single":
 		
-		output_files = []
-		for file_name in args.metadata:
+		#output_files = []
+		#for file_name in args.metadata:
 			output_file = convert_xlsx_to_txt(file_name)
-			output_files.append(output_file)
+		#	output_files.append(output_file)
 
-		for output_file in output_files:
+		#for output_file in output_files:
 			sp.run(f'Rscript {script_path}/convert_barcode_names.R {output_file}', shell=True)
 
 			kit_name = get_kit_name(output_file)
