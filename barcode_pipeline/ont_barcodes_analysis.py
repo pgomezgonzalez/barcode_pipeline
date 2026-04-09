@@ -92,7 +92,7 @@ def cli():
 		
 		#output_files = []
 		#for file_name in args.metadata:
-		output_file = convert_xlsx_to_txt(file_name)
+		output_file = convert_xlsx_to_txt(metadata)
 		#	output_files.append(output_file)
 
 		#for output_file in output_files:
