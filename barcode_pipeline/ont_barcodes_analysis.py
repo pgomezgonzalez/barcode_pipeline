@@ -572,7 +572,7 @@ def cli():
 	###Rename files with prefix of the run to differentiate 
 	#sp.run(f'mv lineplot_barcodes.png {args.prefix}.lineplot_barcodes.png', shell=True)
 	#sp.run(f'mv barplot_barcodes.png {args.prefix}.barplot_barcodes.png', shell=True)
-	sp.run(rf'for f in results*.xlsx; do [ -e "$f" ] && mv "$f" "{args.prefix}$f"; done',shell=True,check=False)
+	sp.run(rf'for f in results*.xlsx; do [ -e "$f" ] && mv "$f" "{args.prefix}.$f"; done',shell=True,check=False)
 	sp.run(rf'for f in table_reads*.txt; do [ -e "$f" ] && mv "$f" "{args.prefix}.$f"; done', shell=True,check=False) 
 	sp.run(rf'for f in table_proportions*.txt; do [ -e "$f" ] && mv "$f" "{args.prefix}.$f"; done', shell=True,check=False)
 	sp.run(rf'for f in table_percentages*.txt; do [ -e "$f" ] && mv "$f" "{args.prefix}.$f"; done', shell=True, check=False)
