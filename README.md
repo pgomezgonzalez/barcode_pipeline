@@ -12,13 +12,13 @@ Copy the file into your profile in the server. In the terminal, go to the direct
 
 ```
 cd ~/Downloads
-scp ont_barcodes.yml username@10.18.0.25
+scp ont_barcodes.yml username@XX.XX.X.XX
 ```
 It will ask you for your password (same as your `username`), and then copy the file into your profile in the server. 
 
 Now go to the server:
 ```
-ssh -X username@10.18.0.25
+ssh -X username@XX.XX.X.XX
 ```
 And create the conda enviroment by typing 
 ```
